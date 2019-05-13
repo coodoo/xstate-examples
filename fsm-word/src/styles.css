@@ -1,0 +1,73 @@
+
+.intLink {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #0000ff;
+}
+
+body * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 300px;
+  height: 200px;
+  margin: 0 auto;
+  border: 2px solid gray;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1.2em;
+}
+
+.readout {
+  font-size: 32px;
+  color: #333;
+  text-align: right;
+  padding: 5px 13px;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid gray;
+  box-sizing: border-box;
+}
+
+.button-grid {
+  display: grid;
+  padding: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 15px;
+}
+
+.btn {
+  padding: 4px;
+  font-size: 1em;
+  color: #d29b9b;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid grey;
+  /*opacity: 0.8;*/
+}
+
+.btn:disabled {
+	opacity: 0.2;
+}
+
+.btn-down {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.calc-button:hover {
+  opacity: 1;
+}
+
+.calc-button:active {
+  background: #999;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.two-span {
+  grid-column: span 2;
+  background-color: #3572db;
+}
