@@ -32,3 +32,5 @@ If you are working on a typical `CRUD` style application, follow along `fsm-crud
 If you need basic concurrency, follow along `service-1-callback`.
 
 If you need complex concurrency and fine-grained control of each thread, follow along `service-3-actor`
+
+If none of above can't solve your problem, ping me 😎
