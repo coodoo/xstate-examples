@@ -41,3 +41,7 @@ yarn run build
 ````
 
 After this was done, run `yarn start`.
+
+## Statechart
+
+![service-3](https://user-images.githubusercontent.com/325936/57836013-6746e080-77f2-11e9-9cf6-39b6f380595f.png)
