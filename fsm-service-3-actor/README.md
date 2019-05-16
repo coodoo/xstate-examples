@@ -27,3 +27,17 @@ Demonstrating how to model multi-thread application with `xstate` which requires
 - Also note tests and implementations were done side by side, not before nor after, which means when you are implementing the feature, you are also writing the test on the side (to verify the feature you just implemented actually works), gone are the day of manually testing during development, then add unit tests right before openning the PR just for the sake of it.
 
 	As a side note, this is not `TDD` either, for that it requires one to write test up-front, instead, I'm proposing to write test along with the implementation, hence making writing tests part of the implementation, and vice versa.
+
+## Temporary workaround
+
+We used the latest command `spawn()` in this example, which is still in beta, for it to work, you need to run following steps to build the latest version of xstate (make sure you have typescript compiler installed globally):
+
+```
+yarn remove xstate
+yarn add https://github.com/davidkpiano/xstate
+cd node_modules/xstate
+yarn
+yarn run build
+````
+
+After this was done, run `yarn start`.

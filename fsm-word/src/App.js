@@ -8,6 +8,8 @@ import './styles.css'
 import { isNumber, isOperator, current, dump } from './helpers'
 import classNames from 'classnames'
 
+import { StateChart } from '@statecharts/xstate-viz'
+
 function insertMetachars(oMsgInput, sStartTag, sEndTag) {
 	var bDouble = arguments.length > 1,
 		// oMsgInput = document.myForm.myTxtArea,
@@ -104,6 +106,8 @@ export const App = () => {
 
 	const btnDisabled = state.matches('globals.selection.notSelected')
 	const pasteDisabled = state.matches('globals.clipboard.notFilled')
+
+	// return <StateChart machine={machine} />
 
 	return (
 		<div>

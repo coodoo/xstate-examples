@@ -5,6 +5,8 @@ import Row from './row'
 
 import './styles.css'
 
+import { StateChart } from '@statecharts/xstate-viz'
+
 import whyDidYouRender from '@welldone-software/why-did-you-render'
 whyDidYouRender(React)
 
@@ -52,6 +54,8 @@ const App = () => {
 		border: allDone ? '10px solid red' : null,
 		width: 150,
 	}
+
+	// return <StateChart machine={MainMachine} />
 
 	return (
 		<div>

@@ -9,8 +9,11 @@ import { randomId } from '../utils/helpers'
 
 import '../components/styles.css'
 
+import { StateChart } from '@statecharts/xstate-viz'
+
 import whyDidYouRender from '@welldone-software/why-did-you-render'
 whyDidYouRender(React)
+
 
 // to store { state, send } from fsm
 const MyContext = React.createContext()
@@ -395,6 +398,8 @@ const App = memo(() => {
 	useEffect(() => {
 		notify(notifications, send)
 	})
+
+	// return <StateChart machine={MainMachine} />
 
 	return (
 		<div className="App">

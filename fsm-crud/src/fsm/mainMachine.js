@@ -55,6 +55,10 @@ export const MainMachine = Machine(
 				initial: 'loading',
 
 				invoke: [
+					{
+						id: 'ItemService',
+						src: 'itemService',
+					},
 					// test: showing how to cancel request
 					{
 						id: 'CancelService',

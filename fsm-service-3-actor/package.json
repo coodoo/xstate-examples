@@ -15,7 +15,7 @@
     "react-scripts": "2.1.8",
     "react-testing-library": "^7.0.0",
     "toasted-notes": "^2.1.5",
-    "xstate": "^4.5.0"
+    "xstate": "https://github.com/davidkpiano/xstate"
   },
   "devDependencies": {
     "typescript": "3.3.3"

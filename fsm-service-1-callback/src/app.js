@@ -5,6 +5,8 @@ import { useMachine } from '@xstate/react'
 import CompressMachine from './machine'
 import { dump } from './helpers'
 
+import { StateChart } from '@statecharts/xstate-viz'
+
 import './styles.css'
 
 import whyDidYouRender from '@welldone-software/why-did-you-render'
@@ -98,7 +100,8 @@ const App = () => {
 		width: 150,
 	}
 
-	// box-sizing: border-box;
+	// return <StateChart machine={CompressMachine} />
+
 	return (
 		<div>
 			<button onClick={handleAddFile}>Add Job</button>
