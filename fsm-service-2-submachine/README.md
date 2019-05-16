@@ -3,14 +3,18 @@ This example show cases another way of having multiple sub-fsm running, each tie
 
 # Goal
 
-	- showing another way of implementing concurrency with multiple sub-machines and how they interact with the ui (via child components)
+- showing another way of implementing concurrency with multiple sub-machines and how they interact with the ui (via child components)
 
-	- at the same time trying to avoid unnecessary re-render as much as possible
+- at the same time trying to avoid unnecessary re-render as much as possible
 
 # Core features
 
-	- Notice this is not using `invoke` to start service, instead it let each child component to start it's own `fsm`
+- Notice this is not using `invoke` to start service, instead it let each child component to start it's own `fsm`
 
-	- Pay attention to how main fsm communicate with sub-fsm via the `onUpdate` function inside the child component
+- Pay attention to how main fsm communicate with sub-fsm via the `onUpdate` function inside the child component
 
-	- Generally speaking this is a bad approach once the new API `spawn(actor)` is out, that's a much better way of handling concurrency and inter-fsm communication along with lowest impact on the ui front
+- Generally speaking this is a bad approach once the new API `spawn(actor)` is out, that's a much better way of handling concurrency and inter-fsm communication along with lowest impact on the ui front
+
+## Statechart
+
+![service-2](https://user-images.githubusercontent.com/325936/57836014-6746e080-77f2-11e9-9650-a7184fa40dd4.png)
