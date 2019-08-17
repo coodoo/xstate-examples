@@ -1,9 +1,9 @@
 
-These examples showcased how to implement most common use cases with `statecharts` using `xstate`.
+These examples showcased practical and common use cases of `statecharts` using `xstate`.
 
 It is recommend to start with `fsm-crud` which showcased the most basic operations one might need on a daily basis.
 
-`service-3-actor` is the most complex and updated example that showcased how to model and implement concurrency with `statecharts` in an `actor` manner.
+`service-3-actor` is the most complex and up to date example that showcased how to model and implement concurrency using `statecharts` in an `actor` manner.
 
 ## The goal of each example is listed below.
 
