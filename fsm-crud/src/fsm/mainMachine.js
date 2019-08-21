@@ -7,7 +7,9 @@ import { Enum } from 'enumify'
 import { ServiceTypes } from './services'
 import { cancelService } from './cancelService'
 
-export class MainTypes extends Enum {}
+export class MainTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 MainTypes.initEnum([
 	'itemSelect',
 	'itemDetails',

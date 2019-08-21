@@ -5,7 +5,9 @@ import * as actions from './mainActions'
 // import * as guards from './guards'
 import { Enum } from 'enumify'
 
-export class MainTypes extends Enum {}
+export class MainTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 MainTypes.initEnum([
 	'addFile',
 	'updateJob',

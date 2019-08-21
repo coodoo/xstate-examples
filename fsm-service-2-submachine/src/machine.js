@@ -3,7 +3,9 @@ import { Machine, send } from 'xstate'
 import { updater, assign } from './xstateImmer'
 import { Enum } from 'enumify'
 
-export class Types extends Enum {}
+export class Types extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 Types.initEnum(['itemSelect'])
 
 export default Machine(

@@ -2,7 +2,9 @@ import { random } from '../utils/helpers'
 import { WorkerTypes } from './workerMachine'
 import { Enum } from 'enumify'
 
-export class CompServiceTypes extends Enum {}
+export class CompServiceTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 CompServiceTypes.initEnum([
 	'pauseSong',
 	'cancelSong',

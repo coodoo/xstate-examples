@@ -4,7 +4,9 @@ import * as actions from '../fsm/workerActions'
 import { compressionService } from '../fsm/compressionService'
 import { Enum } from 'enumify'
 
-export class WorkerTypes extends Enum {}
+export class WorkerTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 WorkerTypes.initEnum([
 	'startJob',
 	'workerProgress',

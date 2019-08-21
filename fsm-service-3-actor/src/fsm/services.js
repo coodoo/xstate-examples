@@ -2,7 +2,9 @@ import { uuid } from '../utils/helpers'
 import { Enum } from 'enumify'
 import { Types } from '../fsm/machine'
 
-export class ServiceTypes extends Enum {}
+export class ServiceTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 ServiceTypes.initEnum([
 	'loadItems',
 	'itemDeleteConfirm',

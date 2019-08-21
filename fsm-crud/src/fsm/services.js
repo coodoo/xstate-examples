@@ -2,7 +2,9 @@ import { randomId } from '../utils/helpers'
 import { Enum } from 'enumify'
 import { MainTypes } from '../fsm/mainMachine'
 
-export class ServiceTypes extends Enum {}
+export class ServiceTypes extends Enum {
+	indexOf = (str) => this.name.indexOf(str);
+}
 ServiceTypes.initEnum(['loadItems', 'itemDeleteConfirm', 'createItems'])
 
 export const itemService = (ctx, e) => (cb, onReceive) => {
