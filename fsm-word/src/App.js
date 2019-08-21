@@ -8,7 +8,7 @@ import './styles.css'
 import { isNumber, isOperator, current, dump } from './helpers'
 import classNames from 'classnames'
 
-import { StateChart } from '@statecharts/xstate-viz'
+// import { StateChart } from '@statecharts/xstate-viz'
 
 function insertMetachars(oMsgInput, sStartTag, sEndTag) {
 	var bDouble = arguments.length > 1,

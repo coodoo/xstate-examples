@@ -11,7 +11,7 @@ import {
 	current,
 } from './helpers'
 
-import { StateChart } from '@statecharts/xstate-viz'
+// import { StateChart } from '@statecharts/xstate-viz'
 
 export const App = () => {
 

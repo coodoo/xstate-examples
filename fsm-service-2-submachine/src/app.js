@@ -9,7 +9,7 @@ import Row from './row'
 
 import './styles.css'
 
-import { StateChart } from '@statecharts/xstate-viz'
+// import { StateChart } from '@statecharts/xstate-viz'
 
 import whyDidYouRender from '@welldone-software/why-did-you-render'
 whyDidYouRender(React)

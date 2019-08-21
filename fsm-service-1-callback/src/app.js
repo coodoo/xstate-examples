@@ -5,7 +5,7 @@ import { useMachine } from '@xstate/react'
 import CompressMachine from './machine'
 import { dump } from './helpers'
 
-import { StateChart } from '@statecharts/xstate-viz'
+// import { StateChart } from '@statecharts/xstate-viz'
 
 import './styles.css'
 
