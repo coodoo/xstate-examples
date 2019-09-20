@@ -1,276 +1,244 @@
-import { Machine, send } from 'xstate'
-import { updater, assign } from '../xstate-custom/xstateImmer'
+/* eslint-disable */
+import { Machine, send, assign } from 'xstate'
 import * as actions from './mainActions'
 import * as services from './services'
 import * as guards from './guards'
-import { Enum } from 'enumify'
 import { ServiceTypes } from './services'
 import { cancelService } from './cancelService'
 
-export class MainTypes extends Enum {}
-MainTypes.initEnum([
-	'itemSelect',
-	'itemDetails',
-	'itemEdit',
-	'itemBack',
-	'newItemCancel',
-	'newItemSubmit',
-	'editCancel',
-	'editSubmit',
-	'itemReload',
-	'itemLoadSuccess',
-	'itemLoadFail',
-	'itemNew',
-	'newItemSuccess',
-	'newItemFail',
-	'itemDelete',
-	'modalDeleteItemConfirm',
-	'modalDeleteItemCancel',
-	'modalDeleteItemSuccess',
-	'modalDeleteItemFail',
-	'modalDataErrorClose',
-	'modalDataErrorRetry',
-	'clearNotification',
-	'testMe',
-])
+const fsm = {
+	id: 'MyApp',
+	initial: 'main',
 
-export const MainMachine = Machine(
-	{
-		id: 'MyApp',
-		// initial: 'main',
+	context: {
+		items: [],
+		selectedItemId: null,
+		modalData: null,
+		notifications: [],
+	},
 
-		context: {
-			items: [],
-			selectedItemId: null,
-			modalData: null,
-			notifications: [],
-		},
+	// main | global
+	type: 'parallel',
 
-		// main | global
-		type: 'parallel',
+	// top level
+	states: {
+		main: {
+			initial: 'loading',
 
-		// top level
-		states: {
-			main: {
-				initial: 'loading',
+			invoke: [
+				{
+					id: 'ItemService',
+					src: 'itemService',
+				},
+				// test: showing how to cancel request
+				{
+					id: 'CancelService',
+					src: cancelService,
+				},
+			],
 
-				invoke: [
-					{
-						id: 'ItemService',
-						src: 'itemService',
-					},
-					// test: showing how to cancel request
-					{
-						id: 'CancelService',
-						src: cancelService,
-					},
-				],
+			states: {
+				//
+				loading: {
+					onEntry: 'reloadItems',
+				},
 
-				states: {
-					//
-					loading: {
-						onEntry: 'reloadItems',
-					},
-
-					//
-					master: {
-						on: {
-							[MainTypes.itemDetails]: {
-								target: 'details',
-								actions: 'selectItem',
-							},
-							[MainTypes.itemEdit]: {
-								target: 'edit',
-								actions: 'setExitTo',
-							},
-
-							// Test: multiple request and cancellation
-							test: {
-								actions: 'testAction',
-							},
-							testResult: {
-								actions: 'testResultAction',
-							},
-							testError: {
-								actions: '',
-							},
+				//
+				master: {
+					on: {
+						itemDetails: {
+							target: 'details',
+							actions: 'selectItem',
 						},
-					},
-
-					//
-					details: {
-						on: {
-							[MainTypes.itemEdit]: {
-								target: 'edit',
-								actions: 'setExitTo',
-							},
-							[MainTypes.itemBack]: {
-								target: 'master',
-							},
+						itemEdit: {
+							target: 'edit',
+							actions: 'setExitTo',
 						},
-					},
 
-					//
-					new: {
-						on: {
-							// cancel an edit might lead back to master or detail screen, hence using a guard state to tell
-							[MainTypes.newItemCancel]: {
-								target: 'unknown',
-							},
-							[MainTypes.newItemSubmit]: {
-								target: 'master',
-								actions: ['preSubmitNewItem', 'submitNewItem'],
-							},
+						// Test: multiple request and cancellation
+						test: {
+							actions: 'testAction',
 						},
-					},
-
-					//
-					edit: {
-						on: {
-							[MainTypes.editCancel]: {
-								target: 'unknown',
-							},
-							[MainTypes.editSubmit]: {
-								target: 'details',
-								actions: 'editSubmit',
-							},
+						testResult: {
+							actions: 'testResultAction',
 						},
-					},
-
-					unknown: {
-						on: {
-							'': [
-								{
-									target: 'master',
-									cond: 'unknownMaster',
-								},
-								{
-									target: 'details',
-									cond: 'unknownDetails',
-								},
-							],
+						testError: {
+							actions: '',
 						},
 					},
 				},
 
-				// main - top level events
-				on: {
-					[MainTypes.itemReload]: {
-						actions: 'reloadItems',
+				//
+				details: {
+					on: {
+						itemEdit: {
+							target: 'edit',
+							actions: 'setExitTo',
+						},
+						itemBack: {
+							target: 'master',
+						},
 					},
+				},
 
-					[MainTypes.itemLoadSuccess]: {
-						target: '.master',
-						actions: 'listDataSuccess',
+				//
+				new: {
+					on: {
+						// cancel an edit might lead back to master or detail screen, hence using a guard state to tell
+						newItemCancel: {
+							target: 'unknown',
+						},
+						newItemSubmit: {
+							target: 'master',
+							actions: ['preSubmitNewItem', 'submitNewItem'],
+						},
 					},
+				},
 
-					[MainTypes.itemLoadFail]: {
-						target: '',
-						actions: 'listDataError',
+				//
+				edit: {
+					on: {
+						editCancel: {
+							target: 'unknown',
+						},
+						editSubmit: {
+							target: 'details',
+							actions: 'editSubmit',
+						},
 					},
+				},
 
-					[MainTypes.itemNew]: {
-						target: '.new',
-						actions: 'createNewItem',
-					},
-
-					[MainTypes.newItemSuccess]: {
-						actions: 'newItemSuccess',
-					},
-
-					[MainTypes.newItemFail]: {
-						actions: 'newItemFail',
-					},
-
-					[MainTypes.modalDeleteItemConfirm]: {
-						target: '.master',
-						actions: ['confirmItemDelete', 'preDeleteItem'],
-					},
-
-					[MainTypes.modalDeleteItemSuccess]: {
-						actions: 'modalDeleteItemSuccess',
-					},
-
-					[MainTypes.modalDeleteItemFail]: {
-						actions: 'modalDeleteItemFail',
-					},
-
-					[MainTypes.modalDataErrorClose]: {
-						target: '.master',
-						actions: 'modalErrorDataClose',
-					},
-
-					[MainTypes.modalDataErrorRetry]: {
-						target: '',
-						actions: 'reloadItems',
-					},
-
-					[MainTypes.clearNotification]: {
-						actions: 'clearNotification',
-					},
-
-					[MainTypes.testMe]: {
-						actions: assign((ctx, e) => {
-							console.log('[subMachine]', e)
-						}),
+				unknown: {
+					on: {
+						'': [
+							{
+								target: 'master',
+								cond: 'unknownMaster',
+							},
+							{
+								target: 'details',
+								cond: 'unknownDetails',
+							},
+						],
 					},
 				},
 			},
 
-			global: {
-				type: 'parallel',
-				states: {
-					// p1 - selection
-					selection: {
-						initial: 'unSelected',
-						states: {
-							selected: {},
-							unSelected: {},
-						},
-						on: {
-							[MainTypes.itemSelect]: {
-								target: '.selected',
-								actions: 'selectItem',
-							},
-							[MainTypes.modalDeleteItemConfirm]: '.unSelected',
-						},
-					},
+			// main - top level events
+			on: {
+				itemReload: {
+					actions: 'reloadItems',
+				},
 
-					// p2 - modal
-					modal: {
-						initial: 'hide',
-						states: {
-							show: {},
-							hide: {},
+				itemLoadSuccess: {
+					target: '.master',
+					actions: 'listDataSuccess',
+				},
+
+				itemLoadFail: {
+					target: '',
+					actions: 'listDataError',
+				},
+
+				itemNew: {
+					target: '.new',
+					actions: 'createNewItem',
+				},
+
+				newItemSuccess: {
+					actions: 'newItemSuccess',
+				},
+
+				newItemFail: {
+					actions: 'newItemFail',
+				},
+
+				modalDeleteItemConfirm: {
+					target: '.master',
+					actions: ['confirmItemDelete', 'preDeleteItem'],
+				},
+
+				modalDeleteItemSuccess: {
+					actions: 'modalDeleteItemSuccess',
+				},
+
+				modalDeleteItemFail: {
+					actions: 'modalDeleteItemFail',
+				},
+
+				modalDataErrorClose: {
+					target: '.master',
+					actions: 'modalErrorDataClose',
+				},
+
+				modalDataErrorRetry: {
+					target: '',
+					actions: 'reloadItems',
+				},
+
+				clearNotification: {
+					actions: 'clearNotification',
+				},
+
+				testMe: {
+					actions: assign((ctx, e) => {
+						console.log('[subMachine]', e)
+					}),
+				},
+			},
+		},
+
+		global: {
+			type: 'parallel',
+			states: {
+				// p1 - selection
+				selection: {
+					initial: 'unSelected',
+					states: {
+						selected: {},
+						unSelected: {},
+					},
+					on: {
+						itemSelect: {
+							target: '.selected',
+							actions: 'selectItem',
 						},
-						on: {
-							[MainTypes.itemDelete]: {
-								target: '.show',
-								actions: assign((ctx, e) => {
-									ctx.modalData = e.modalData
-									return ctx
-								}),
-							},
-							[MainTypes.modalDeleteItemConfirm]: '.hide',
-							[MainTypes.modalDeleteItemCancel]: {
-								target: '.hide',
-								actions: ['cancelItemDelete'],
-							},
+						modalDeleteItemConfirm: '.unSelected',
+					},
+				},
+
+				// p2 - modal
+				modal: {
+					initial: 'hide',
+					states: {
+						show: {},
+						hide: {},
+					},
+					on: {
+						itemDelete: {
+							target: '.show',
+							actions: assign((ctx, e) => {
+								ctx.modalData = e.modalData
+								return ctx
+							}),
+						},
+						modalDeleteItemConfirm: '.hide',
+						modalDeleteItemCancel: {
+							target: '.hide',
+							actions: ['cancelItemDelete'],
 						},
 					},
 				},
 			},
 		},
 	},
+}
 
+export const MainMachine = Machine(
+	fsm,
 	{
 		actions,
-
-		// Service
 		services,
-
 		guards,
-
-		updater,
 	},
 )

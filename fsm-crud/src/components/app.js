@@ -1,15 +1,13 @@
-/* eslint-disable jsx-a11y/accessible-emoji */
+/* eslint-disable*/
 import React, { useEffect, useState, useRef, useContext, memo } from 'react'
 import toaster from 'toasted-notes'
 import 'toasted-notes/src/styles.css'
 
-import { useMachine } from '../xstate-custom/useMyMachine'
-import { MainMachine, MainTypes } from '../fsm/mainMachine'
+import { useMachine } from '../utils/useMyMachine'
+import { MainMachine, } from '../fsm/mainMachine'
 import { randomId } from '../utils/helpers'
 
 import '../components/styles.css'
-
-import { StateChart } from '@statecharts/xstate-viz'
 
 import whyDidYouRender from '@welldone-software/why-did-you-render'
 whyDidYouRender(React)
@@ -34,11 +32,11 @@ const ModalError = props => {
 			<div>Title: {title}</div>
 			<div>{content}</div>
 
-			<button onClick={e => send({ type: MainTypes.modalDataErrorRetry })}>
+			<button onClick={e => send({ type: 'modalDataErrorRetry' })}>
 				Retry
 			</button>
 
-			<button onClick={e => send({ type: MainTypes.modalDataErrorClose })}>
+			<button onClick={e => send({ type: 'modalDataErrorClose' })}>
 				Close
 			</button>
 		</div>
@@ -57,7 +55,7 @@ const ModalDelete = props => {
 			<button
 				onClick={() =>
 					send({
-						type: MainTypes.modalDeleteItemCancel,
+						type: 'modalDeleteItemCancel',
 					})
 				}
 			>
@@ -67,7 +65,7 @@ const ModalDelete = props => {
 			<button
 				onClick={() =>
 					send({
-						type: MainTypes.modalDeleteItemConfirm,
+						type: 'modalDeleteItemConfirm',
 						data,
 					})
 				}
@@ -89,13 +87,13 @@ const ItemNew = props => {
 		}
 
 		send({
-			type: MainTypes.newItemSubmit,
+			type: 'newItemSubmit',
 			payload: newItem,
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: MainTypes.newItemCancel })
+		send({ type: 'newItemCancel' })
 	}
 
 	const handleChange = e => {
@@ -126,13 +124,13 @@ const ItemEdit = props => {
 
 	const handleSubmit = () => {
 		send({
-			type: MainTypes.editSubmit,
+			type: 'editSubmit',
 			payload: { id, label: content },
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: MainTypes.editCancel })
+		send({ type: 'editCancel' })
 	}
 
 	const handleChange = e => {
@@ -177,7 +175,7 @@ const Details = props => {
 
 		// then dispatch the modal data
 		send({
-			type: MainTypes.itemDelete,
+			type: 'itemDelete',
 			modalData,
 		})
 	}
@@ -190,15 +188,15 @@ const Details = props => {
 			<button
 				onClick={() =>
 					send({
-						type: MainTypes.itemNew,
+						type: 'itemNew',
 						exitTo: 'details',
 					})
 				}
 			>
 				New
 			</button>
-			<button onClick={() => send({ type: MainTypes.itemEdit, exitTo:'details' })}>Edit</button>
-			<button onClick={() => send({ type: MainTypes.itemBack })}>Back</button>
+			<button onClick={() => send({ type: 'itemEdit', exitTo:'details' })}>Edit</button>
+			<button onClick={() => send({ type: 'itemBack' })}>Back</button>
 			<button onClick={handleDelete}>Delete</button>
 		</div>
 	)
@@ -219,14 +217,14 @@ const Listing = props => {
 		}
 		//
 		send({
-			type: MainTypes.itemDelete,
+			type: 'itemDelete',
 			modalData,
 		})
 	}
 
 	const handleViewDetails = itm => {
 		send({
-			type: MainTypes.itemDetails,
+			type: 'itemDetails',
 			item: itm,
 			exitTo: 'master',
 		})
@@ -238,7 +236,7 @@ const Listing = props => {
 				style={itm.id === selectedItemId ? { backgroundColor: 'pink' } : null}
 				onClick={e => {
 					send({
-						type: MainTypes.itemSelect,
+						type: 'itemSelect',
 						item: itm,
 					})
 				}}
@@ -268,7 +266,7 @@ const Listing = props => {
 				id='btnAdd'
 				onClick={() =>
 					send({
-						type: MainTypes.itemNew,
+						type: 'itemNew',
 						exitTo: 'master',
 					})
 				}
@@ -279,7 +277,7 @@ const Listing = props => {
 
 			<button
 				id='btnEdit'
-				onClick={() => send({ type: MainTypes.itemEdit, exitTo: 'master' })}
+				onClick={() => send({ type: 'itemEdit', exitTo: 'master' })}
 				disabled={!btnEnabled}
 			>
 				Edit
@@ -295,7 +293,7 @@ const Listing = props => {
 
 			<button
 				id='btnReload'
-				onClick={() => send({ type: MainTypes.itemReload })}
+				onClick={() => send({ type: 'itemReload' })}
 			>
 				Reload
 			</button>
@@ -311,7 +309,7 @@ const Listing = props => {
 					// 	signal.current.abort()
 					// const controller = new AbortController()
 					// signal.current = controller
-					// send({ type: MainTypes.test, signal: signal.current.signal })
+					// send({ type: test, signal: signal.current.signal })
 
 					// cancel previous request first
 					if(signal.current)
@@ -330,6 +328,7 @@ const Listing = props => {
 
 const getModal = () => {
 
+	// +TBD: 這裏可能不能用 useContext?
 	const { state } = useContext(MyContext)
 	const { modalData } = state.context
 
@@ -366,7 +365,7 @@ const notify = (items, send) => {
 	})
 
 	send({
-		type: MainTypes.clearNotification,
+		type: 'clearNotification',
 		popped: items,
 	})
 }
@@ -398,8 +397,6 @@ const App = memo(() => {
 	useEffect(() => {
 		notify(notifications, send)
 	})
-
-	// return <StateChart machine={MainMachine} />
 
 	return (
 		<div className="App">

@@ -32,3 +32,8 @@ Demonstrating how to model CRUD application with `xstate` using `parallel states
 ## Statechart
 
 ![crud](https://user-images.githubusercontent.com/325936/57836016-67df7700-77f2-11e9-83ba-142c1ebd1680.png)
+
+# todo
+	- toast 呼叫移入 fsm 內，它是 action 可操作的 side effect
+	- 修正 eslint 錯誤(目前全部 disable)
+	- 移除所有 manifest.json

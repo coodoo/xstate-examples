@@ -1,9 +1,7 @@
-import { assign } from '../xstate-custom/xstateImmer'
-import { send } from 'xstate'
-import { ServiceTypes } from './services'
+import { send, assign } from 'xstate'
 
 export const reloadItems = send(
-	{ type: ServiceTypes.loadItems },
+	{ type: 'loadItems' },
 	{ to: 'ItemService' },
 )
 
@@ -41,7 +39,7 @@ export const confirmItemDelete = send(
 	//
 	(ctx, e) => {
 		return {
-			type: ServiceTypes.itemDeleteConfirm,
+			type: 'itemDeleteConfirm',
 			data: e.data,
 		}
 	},
@@ -104,7 +102,7 @@ export const preSubmitNewItem = assign((ctx, e) => {
 // invoke service to persist new item via external api call
 export const submitNewItem = send(
 	(ctx, e) => ({
-		type: ServiceTypes.createItems,
+		type: 'createItems',
 		payload: e.payload,
 		forceFail: e.forceFail,
 	}),

@@ -1,9 +1,4 @@
 import { randomId } from '../utils/helpers'
-import { Enum } from 'enumify'
-import { MainTypes } from '../fsm/mainMachine'
-
-export class ServiceTypes extends Enum {}
-ServiceTypes.initEnum(['loadItems', 'itemDeleteConfirm', 'createItems'])
 
 export const itemService = (ctx, e) => (cb, onReceive) => {
 	let cnt = 0
@@ -11,7 +6,7 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 	onReceive(evt => {
 		switch (evt.type) {
-			case ServiceTypes.loadItems:
+			case 'loadItems':
 				const newItem = () => {
 					const id = randomId()
 					const d = {
@@ -23,18 +18,18 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				const arr = [newItem(), newItem(), newItem()]
 
 				cb({
-					type: MainTypes.itemLoadSuccess,
+					type: 'itemLoadSuccess',
 					data: arr,
 				})
 
 				// cb({
-				// 	type: MainTypes.itemLoadFail,
+				// 	type: itemLoadFail,
 				// 	data: 'network error',
 				// })
 
 				break
 
-			case ServiceTypes.itemDeleteConfirm:
+			case 'itemDeleteConfirm':
 				const item = evt.data
 
 				new Promise((resolve, reject) => {
@@ -53,21 +48,21 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 					.then(result => {
 						// console.log( '\tconfirmHandler completed: ', result )
 						cb({
-							type: MainTypes.modalDeleteItemSuccess,
+							type: 'modalDeleteItemSuccess',
 							result,
 						})
 					})
 
 					.catch(error => {
 						cb({
-							type: MainTypes.modalDeleteItemFail,
+							type: 'modalDeleteItemFail',
 							error,
 						})
 					})
 
 				break
 
-			case ServiceTypes.createItems:
+			case 'createItems':
 				const localItem = evt.payload
 
 				// 操作 async side effect
@@ -90,13 +85,13 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				})
 					.then(result => {
 						cb({
-							type: MainTypes.newItemSuccess,
+							type: 'newItemSuccess',
 							result,
 						})
 					})
 					.catch(error => {
 						cb({
-							type: MainTypes.newItemFail,
+							type: 'newItemFail',
 							error,
 						})
 					})
@@ -121,14 +116,14 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 					.then(result => {
 						console.log('cancelled?', cancelled)
 						cb({
-							type: MainTypes.modalDeleteItemSuccess,
+							type: 'modalDeleteItemSuccess',
 							result,
 						})
 					})
 
 					.catch(error => {
 						cb({
-							type: MainTypes.modalDeleteItemFail,
+							type: 'modalDeleteItemFail',
 							error,
 						})
 					})

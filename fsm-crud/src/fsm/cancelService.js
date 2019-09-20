@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { randomId } from '../utils/helpers'
 
 export const cancelService = (ctx, e) => (cb, onReceive) => {
