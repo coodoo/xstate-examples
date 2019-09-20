@@ -1,7 +1,7 @@
 
-These examples showcased practical and common use cases of `statecharts` using `xstate`.
+These examples showcased practical use cases of `statecharts` using `xstate`.
 
-It is recommend to start with `fsm-crud` which showcased the most basic operations one might need on a daily basis.
+It is recommend to start with `fsm-crud` which demonstrateed the most basic operations one might need on a daily basis.
 
 `service-3-actor` is the most complex and up to date example that showcased how to model and implement concurrency using `statecharts` in an `actor` manner.
 
@@ -20,7 +20,7 @@ It is recommend to start with `fsm-crud` which showcased the most basic operatio
 	- simple approach of implementing multi-thread jobs with one service, each job could be pasued/resumed/cancelled
 
 - `fsm-service-2-submachine`
-	- another way of implementing multi-thread jobs by letting each child component starts it's own sub-fsm, and using ui layer to piece together the application
+	- another way of implementing multi-thread jobs by letting each child component starts it's own sub-fsm, and using ui layer to piece together the whole operation
 
 - `fsm-service-3-actor`
 	- the recommended way of implementing concurrency by creating multiple services and let them communicate with each other in a `actor` manner
