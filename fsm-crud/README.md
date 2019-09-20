@@ -34,6 +34,13 @@ Demonstrating how to model CRUD application with `xstate` using `parallel states
 ![crud](https://user-images.githubusercontent.com/325936/57836016-67df7700-77f2-11e9-83ba-142c1ebd1680.png)
 
 # todo
+
+	- 搞清楚 service 與 actor 的差異
+
+	- 研究取代 state.matches('main.master') 的手法
+		- 還是用 activity 嗎？
+
 	- toast 呼叫移入 fsm 內，它是 action 可操作的 side effect
+		- 目前是在 app.js 內的 notify() 負責處理，它要多次更新 fsm 內容並觸發重繪
 	- 修正 eslint 錯誤(目前全部 disable)
 	- 移除所有 manifest.json

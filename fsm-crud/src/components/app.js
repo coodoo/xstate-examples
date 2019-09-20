@@ -23,6 +23,7 @@ const modalStyles = {
 	backgroundColor: '#ffff0059',
 }
 
+//
 const ModalError = props => {
 	const { send } = useContext(MyContext)
 	const { title, content } = props
@@ -43,6 +44,7 @@ const ModalError = props => {
 	)
 }
 
+//
 const ModalDelete = props => {
 	const { send } = useContext(MyContext)
 	const { title, content, data } = props
@@ -76,6 +78,7 @@ const ModalDelete = props => {
 	)
 }
 
+//
 const ItemNew = props => {
 	const { send } = useContext(MyContext)
 	const [content, setContent] = useState('')
@@ -116,6 +119,7 @@ const ItemNew = props => {
 	)
 }
 
+//
 const ItemEdit = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
@@ -153,6 +157,7 @@ const ItemEdit = props => {
 	)
 }
 
+//
 const Details = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
@@ -202,6 +207,7 @@ const Details = props => {
 	)
 }
 
+//
 const Listing = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
@@ -326,9 +332,9 @@ const Listing = props => {
 	)
 }
 
+//
 const getModal = () => {
 
-	// +TBD: 這裏可能不能用 useContext?
 	const { state } = useContext(MyContext)
 	const { modalData } = state.context
 
@@ -353,6 +359,7 @@ const getModal = () => {
 
 const getItemById = (items, id) => items.find(it => it.id === id)
 
+//
 const notify = (items, send) => {
 
 	if (items.length === 0) return
@@ -394,9 +401,11 @@ const App = memo(() => {
 
 	const modal = getModal()
 
+	// didMount
 	useEffect(() => {
 		notify(notifications, send)
-	})
+		return () => {}
+	}, [])
 
 	return (
 		<div className="App">

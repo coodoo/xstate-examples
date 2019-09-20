@@ -156,6 +156,16 @@ export const testAction = send(
 	{ to: 'CancelService' },
 )
 
-export const testResultAction = assign((cxt, e) => {
+export const testResultAction = assign((ctx, e) => {
 	console.log('[subMachine result]', e)
 })
+
+export const testMe = assign((ctx, e) => {
+	console.log('[subMachine]', e)
+})
+
+export const itemDelete = assign((ctx, e) => {
+	ctx.modalData = e.modalData
+	return ctx
+})
+

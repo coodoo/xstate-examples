@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState, useRef, useEffect } from 'react'
 import { interpret } from 'xstate'
 
