@@ -13,7 +13,9 @@ export const randomId = () => Math.floor(Math.random()*999)
 export const noop = () => {}
 
 // dump state tree in string format
-export const dumpState = (item, depth=100) => {
+export const dumpState = (item, depth = 1) => {
+	// if (depth == 1) console.log('\n')
+
 	const MAX_DEPTH = 100
 	depth = depth || 0
 	let isString = typeof item === 'string'
@@ -26,20 +28,25 @@ export const dumpState = (item, depth=100) => {
 
 	for (var key in item) {
 		console.group(key)
-		dump(item[key], depth + 1)
+		dumpState(item[key], depth + 1)
 		console.groupEnd()
 	}
 }
 
 // for fsm test
-export const dump = svc =>
-	console.log(
-		'\n--------------------------------------\n[state]',
-		svc.state.value,
-		'\n  [ctx]',
-		svc.state.context,
-		'\n--------------------------------------',
-	)
+export const dump = svc => {
+	if(svc.state){
+		console.log(
+			'\n--------------------------------------\n[state]',
+			svc.state.value,
+			'\n  [ctx]',
+			svc.state.context,
+			'\n--------------------------------------',
+		)
+	}else{
+		console.log( '是空的: ', svc )
+	}
+}
 
 
 export const current = state => state.toStrings().pop()

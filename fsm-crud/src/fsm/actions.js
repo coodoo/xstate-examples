@@ -1,8 +1,8 @@
 import { send, assign } from 'xstate'
 
 export const reloadItems = send(
-	{ type: 'loadItems' },
-	{ to: 'ItemService' },
+	{ type: 'loadItems' }, // the event to be sent
+	{ to: 'ItemService' }, // the target servcie to receive that event
 )
 
 export const listDataSuccess = assign((ctx, evt) => {
@@ -82,7 +82,11 @@ export const modalDeleteItemSuccess = assign((ctx, e) => {
 export const modalErrorDataClose = assign((ctx, e) => {
 	ctx.modalData = null
 	ctx.notifications.push('Loading Error dismissed')
-	return ctx
+})
+
+export const modalErrorDataRetry = assign((ctx, e) => {
+	ctx.modalData = null
+	ctx.notifications.push('Loading Error dismissed')
 })
 
 export const createNewItem = assign((ctx, e) => {

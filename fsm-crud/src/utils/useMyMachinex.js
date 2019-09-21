@@ -22,6 +22,7 @@ export function useMachine(machine, options={}) {
 
 			const { debug = false } = options
 
+			console.log( '有值: ', debug )
 			// DEBUG
 			if( debug === true && state.changed === false ){
 				console.error(

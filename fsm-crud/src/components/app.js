@@ -3,14 +3,15 @@ import React, { useEffect, useState, useRef, useContext, memo } from 'react'
 import toaster from 'toasted-notes'
 import 'toasted-notes/src/styles.css'
 
-import { useMachine } from '../utils/useMyMachine'
-import { MainMachine, } from '../fsm/mainMachine'
-import { randomId } from '../utils/helpers'
+import { useMachine, useService } from '@xstate/react'
+import { interpret } from 'xstate'
+import { machine, } from '../fsm/machine'
+import { randomId, dumpState } from '../utils/helpers'
 
 import '../components/styles.css'
 
-import whyDidYouRender from '@welldone-software/why-did-you-render'
-whyDidYouRender(React)
+// import whyDidYouRender from '@welldone-software/why-did-you-render'
+// whyDidYouRender(React)
 
 
 // to store { state, send } from fsm
@@ -280,7 +281,6 @@ const Listing = props => {
 				New
 			</button>
 
-
 			<button
 				id='btnEdit'
 				onClick={() => send({ type: 'itemEdit', exitTo: 'master' })}
@@ -304,7 +304,7 @@ const Listing = props => {
 				Reload
 			</button>
 
-			<button
+			{/*<button
 				id='btnTest'
 				onClick={() => {
 
@@ -327,7 +327,7 @@ const Listing = props => {
 				}}
 			>
 				Test
-			</button>
+			</button>*/}
 		</div>
 	)
 }
@@ -357,9 +357,10 @@ const getModal = () => {
 	return modal
 }
 
+// helper
 const getItemById = (items, id) => items.find(it => it.id === id)
 
-//
+// +TBD: 放入 fsm 內
 const notify = (items, send) => {
 
 	if (items.length === 0) return
@@ -377,7 +378,8 @@ const notify = (items, send) => {
 	})
 }
 
-const App = memo(() => {
+// main app
+const App = props => {
 	const { state, send } = useContext(MyContext)
 
 	// console.log('\n[State] = ', state.value, '\n[context] = ', state.context)
@@ -417,19 +419,50 @@ const App = memo(() => {
 			{modal}
 		</div>
 	)
-})
+}
 
 
 export const Wrap = () => {
-	const [state, send] = useMachine(MainMachine, { log: true })
 
-	// so fsm and send in context so that it's easier to access within sub-components
+	console.log( '\n\n\n Wrap 跑',   )
+
+	const service = interpret(machine)
+	.onTransition( state => {
+		// DEBUG
+		if( state.changed === false ){
+			console.error(
+				`\n\n💣💣💣 [UNHANDLED EVENT]💣💣💣\nEvent=`,
+				state.event,
+
+				'\nState=',
+				state.value, state,
+
+				'\nContext=',
+				state.context,
+				'\n\n' )
+
+			// console.log( 'state:', state )
+		}
+
+		console.log( '\n⬇️⬇️ - - - - - - - - - - -',  )
+		dumpState(state.value)
+		console.log( 'ctx=', state.context )
+		console.log( 'evt=', state.event )
+		console.log( '⬆️ - - - - - - - - - - -\n',  )
+
+	})
+	// .onEvent( e => {
+	// 	console.log( '\t[Event]', e )
+	// })
+
+	service.start()
+
 	return (
-		<MyContext.Provider value={{ state, send }}>
+		<MyContext.Provider value={{ state: service.state, send: service.send }}>
 			<App />
 		</MyContext.Provider>
 	)
 }
 
-App.whyDidYouRender = true
-Wrap.whyDidYouRender = true
+// App.whyDidYouRender = true
+// Wrap.whyDidYouRender = true

@@ -20,19 +20,39 @@ export const fsm = {
 			invoke: [
 				{
 					id: 'ItemService',
-					src: 'itemService', // from './services'
-				},
-				// test: showing how to cancel request
-				{
-					id: 'CancelService',
-					src: 'cancelService',
+					src: 'itemService',
 				},
 			],
 
 			states: {
 				//
 				loading: {
-					onEntry: 'reloadItems',
+					// when entrying 'entry' state, run 'reloadItems' action
+					// which will send an event to 'ItemService' to fetch data via API
+					entry: 'reloadItems',
+					on: {
+						itemLoadSuccess: {
+							target: 'master',
+							actions: 'listDataSuccess',
+						},
+						itemLoadFail: {
+							target: 'loadFailed',
+							actions: 'listDataError',
+						},
+					}
+				},
+
+				'loadFailed': {
+					on: {
+						modalDataErrorClose: {
+							target: 'master',
+							actions: 'modalErrorDataClose',
+						},
+						modalDataErrorRetry: {
+							target: 'loading',
+							actions: 'modalErrorDataRetry',
+						},
+					}
 				},
 
 				//
@@ -100,6 +120,7 @@ export const fsm = {
 					},
 				},
 
+				// for transient state, which will be transferred to next state immediately
 				unknown: {
 					on: {
 						'': [
@@ -120,16 +141,6 @@ export const fsm = {
 			on: {
 				itemReload: {
 					actions: 'reloadItems',
-				},
-
-				itemLoadSuccess: {
-					target: '.master',
-					actions: 'listDataSuccess',
-				},
-
-				itemLoadFail: {
-					target: '',
-					actions: 'listDataError',
 				},
 
 				itemNew: {
@@ -156,16 +167,6 @@ export const fsm = {
 
 				modalDeleteItemFail: {
 					actions: 'modalDeleteItemFail',
-				},
-
-				modalDataErrorClose: {
-					target: '.master',
-					actions: 'modalErrorDataClose',
-				},
-
-				modalDataErrorRetry: {
-					target: '',
-					actions: 'reloadItems',
 				},
 
 				clearNotification: {
