@@ -341,6 +341,8 @@ const getModal = () => {
 	// early bailout
 	if (!modalData) return null
 
+console.log( '要拿 modal: ', modalData.type )
+
 	let modal = null
 
 	switch (modalData.type) {

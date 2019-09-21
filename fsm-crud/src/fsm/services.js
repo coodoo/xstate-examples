@@ -9,8 +9,6 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 	let cancelled = false
 	let retries = 0
 
-	// console.log( 'retries: ', retries )
-
 	onReceive(evt => {
 		switch (evt.type) {
 
@@ -33,22 +31,20 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 				// randomly trigger happy and sorrow path to test both scenarios
 				if((new Date().getMilliseconds() % 2) == 0 ){
+					console.log( '\t模擬成功',  )
 					// if fetching succeeded
 					cb({
 						type: 'itemLoadSuccess',
 						data: arr,
 					})
 				} else {
+					console.log( '\t模擬失敗',  )
 					// if fetching failed, we trigger the sorrow path
 					cb({
 						type: 'itemLoadFail',
 						data: 'network error',
 					})
 				}
-
-				console.log( 'retries: ', retries )
-
-
 
 				break
 
