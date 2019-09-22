@@ -13,7 +13,7 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 		switch (evt.type) {
 
 			//
-			case 'loadItemsService':
+			case 'ServiceLoadItems':
 
 				const fakeItem = () => {
 					const id = randomId()
@@ -53,51 +53,49 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 				break
 
-			case 'itemDeleteConfirmService':
+			case 'ServiceItemDeleteConfirm':
 				const item = evt.data
 
 				new Promise((resolve, reject) => {
 					setTimeout(() => {
-						// resolve({
-						// 	info: `item: ${item.id} deleted succesfully`,
-						// })
-
-						reject({
-							info: `item: ${item.id} removal failed`,
-							payload: item,
+						resolve({
+							info: `item: ${item.id} deleted succesfully`,
 						})
+
+						// reject({
+						// 	info: `item: ${item.id} removal failed`,
+						// 	payload: item,
+						// })
 					}, 1200)
 				})
-
-					.then(result => {
-						// console.log( '\tconfirmHandler completed: ', result )
-						cb({
-							type: 'modalDeleteItemSuccess',
-							result,
-						})
+				.then(result => {
+					// console.log( '\tconfirmHandler completed: ', result )
+					cb({
+						type: 'modalDeleteItemSuccess',
+						result,
 					})
-
-					.catch(error => {
-						cb({
-							type: 'modalDeleteItemFail',
-							error,
-						})
+				})
+				.catch(error => {
+					cb({
+						type: 'modalDeleteItemFail',
+						error,
 					})
+				})
 
 				break
 
-			case 'createItemsService':
+			// create new item
+			case 'ServiceCreateItems':
 				const localItem = evt.payload
 
-				// 操作 async side effect
+				// async side effect
 				return new Promise((resolve, reject) => {
-					const serverId = 'server_' + localItem.id.split('tmp_')[1]
 
+					// simulate id generated from server, to replace the temp local id
+					const serverId = 'server_' + localItem.id.split('tmp_')[1]
 					setTimeout(() => {
 						resolve({
-							info: `item: ${localItem.id} - ${
-								localItem.label
-							} created succesfully`,
+							info: `item: ${localItem.id} - ${localItem.label} created succesfully`,
 							serverItem: { ...localItem, id: serverId },
 							localItem,
 						})
@@ -107,18 +105,18 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 						// })
 					}, 1000)
 				})
-					.then(result => {
-						cb({
-							type: 'newItemSuccess',
-							result,
-						})
+				.then(result => {
+					cb({
+						type: 'newItemSuccess',
+						result,
 					})
-					.catch(error => {
-						cb({
-							type: 'newItemFail',
-							error,
-						})
+				})
+				.catch(error => {
+					cb({
+						type: 'newItemFail',
+						error,
 					})
+				})
 
 			// demo: multiple requests with cancellation
 			case 'test':

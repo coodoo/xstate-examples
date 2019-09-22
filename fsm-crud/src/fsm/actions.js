@@ -1,7 +1,7 @@
 import { send, assign } from 'xstate'
 
 export const reloadItems = send(
-	{ type: 'loadItemsService' }, // the event to be sent
+	{ type: 'ServiceLoadItems' }, // the event to be sent
 	{ to: 'ItemService' }, // the target servcie to receive that event
 )
 
@@ -34,10 +34,10 @@ export const setExitTo = assign((ctx, e) => {
 })
 
 export const confirmItemDelete = send(
-	//
+	// notify ItemService to delete item and dispatch once the job is completed
 	(ctx, e) => {
 		return {
-			type: 'itemDeleteConfirmService',
+			type: 'ServiceItemDeleteConfirm',
 			data: e.data,
 		}
 	},
@@ -88,17 +88,17 @@ export const createNewItem = assign((ctx, e) => {
 	ctx.exitNewItemTo = e.exitTo
 })
 
-// optimistic update
+// optimistic update, insert the item with local id
 export const preSubmitNewItem = assign((ctx, e) => {
 	const newItem = e.payload
 	ctx.items.push(newItem)
 	ctx.selectedItemId = newItem.id
 })
 
-// invoke service to persist new item via external api call
+// then invoke service to persist new item via external api call
 export const submitNewItem = send(
 	(ctx, e) => ({
-		type: 'createItemsService',
+		type: 'ServiceCreateItems',
 		payload: e.payload,
 		forceFail: e.forceFail,
 	}),
