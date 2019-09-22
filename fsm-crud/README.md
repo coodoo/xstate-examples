@@ -1,5 +1,10 @@
-
 This is a typical CRUD applicaiton with master|detail|modal screens.
+
+# What's new
+
+	- Refactored optimistic states
+	- Swap Callback service to Promise
+
 
 ## Goal
 
