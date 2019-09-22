@@ -6,7 +6,9 @@ import 'toasted-notes/src/styles.css'
 import { useMachine, useService } from '@xstate/react'
 import { interpret } from 'xstate'
 import { machine, } from '../fsm/machine'
-import { randomId, dumpState } from '../utils/helpers'
+import { randomId, dumpState, stateValuesEqual } from '../utils/helpers'
+
+import styled, { createGlobalStyle } from 'styled-components'
 
 import '../components/styles.css'
 
@@ -17,12 +19,13 @@ import '../components/styles.css'
 // to store { state, send } from fsm
 const MyContext = React.createContext()
 
-const modalStyles = {
-	border: '4px solid black',
-	width: '200px',
-	height: '100px',
-	backgroundColor: '#ffff0059',
-}
+const StyledModal = styled.div`
+	margin: 20px auto;
+	border: 4px solid black;
+	width: 200px;
+	height: 100px;
+	background: #ffff0059;
+`
 
 //
 const ModalError = props => {
@@ -30,7 +33,7 @@ const ModalError = props => {
 	const { title, content } = props
 
 	return (
-		<div style={modalStyles}>
+		<StyledModal>
 			<div>Title: {title}</div>
 			<div>{content}</div>
 
@@ -41,7 +44,7 @@ const ModalError = props => {
 			<button onClick={e => send({ type: 'modalDataErrorClose' })}>
 				Close
 			</button>
-		</div>
+		</StyledModal>
 	)
 }
 
@@ -51,7 +54,7 @@ const ModalDelete = props => {
 	const { title, content, data } = props
 
 	return (
-		<div style={modalStyles}>
+		<StyledModal>
 			<div>Title: {title}</div>
 			<div>{content}</div>
 
@@ -75,7 +78,7 @@ const ModalDelete = props => {
 			>
 				Confirm
 			</button>
-		</div>
+		</StyledModal>
 	)
 }
 
@@ -195,7 +198,7 @@ const Details = props => {
 				onClick={() =>
 					send({
 						type: 'itemNew',
-						exitTo: 'details',
+						exitTo: 'details', // click 'cancel' will go back to detail screen
 					})
 				}
 			>
@@ -247,6 +250,7 @@ const Listing = props => {
 						item: itm,
 					})
 				}}
+				onDoubleClick={() => handleViewDetails(itm)}
 			>
 				{itm.id} - {itm.label}
 			</span>
@@ -274,7 +278,7 @@ const Listing = props => {
 				onClick={() =>
 					send({
 						type: 'itemNew',
-						exitTo: 'master',
+						exitTo: 'master', // click 'cancel' will go back to listing screen
 					})
 				}
 			>
@@ -341,8 +345,6 @@ const getModal = () => {
 	// early bailout
 	if (!modalData) return null
 
-console.log( '要拿 modal: ', modalData.type )
-
 	let modal = null
 
 	switch (modalData.type) {
@@ -362,27 +364,11 @@ console.log( '要拿 modal: ', modalData.type )
 // helper
 const getItemById = (items, id) => items.find(it => it.id === id)
 
-// +TBD: 放入 fsm 內
-const notify = (items, send) => {
-
-	if (items.length === 0) return
-
-	// everything inside context is immutable, can only update it via sending an event
-	items.forEach(it => {
-		toaster.notify(it, {
-			position: 'bottom-right',
-		})
-	})
-
-	send({
-		type: 'clearNotification',
-		popped: items,
-	})
-}
-
 // main app
 const App = props => {
 	const { state, send } = useContext(MyContext)
+
+	console.log( '\nApp',  )
 
 	// console.log('\n[State] = ', state.value, '\n[context] = ', state.context)
 	// console.log('\n[context] = ', state.context)
@@ -406,10 +392,9 @@ const App = props => {
 	const modal = getModal()
 
 	// didMount
-	useEffect(() => {
-		notify(notifications, send)
-		return () => {}
-	}, [])
+	// useEffect(() => {
+	// 	return () => {}
+	// }, [])
 
 	return (
 		<div className="App">
@@ -426,41 +411,69 @@ const App = props => {
 
 export const Wrap = () => {
 
-	console.log( '\n\n\n Wrap 跑',   )
+	// console.log( '\nWrap run'  )
 
-	const service = interpret(machine)
-	.onTransition( state => {
-		// DEBUG
-		if( state.changed === false ){
-			console.error(
-				`\n\n💣💣💣 [UNHANDLED EVENT]💣💣💣\nEvent=`,
-				state.event,
+	const [_, forceUpdate] = useState(0)
+	const once = useRef(false)
+	const service = useRef()
 
-				'\nState=',
-				state.value, state,
-
-				'\nContext=',
-				state.context,
-				'\n\n' )
-
-			// console.log( 'state:', state )
-		}
-
-		console.log( '\n⬇️⬇️ - - - - - - - - - - -',  )
-		dumpState(state.value)
-		console.log( 'ctx=', state.context )
-		console.log( 'evt=', state.event )
-		console.log( '⬆️ - - - - - - - - - - -\n',  )
-
+	const notify = msg => toaster.notify(msg, {
+		position: 'bottom-right',
 	})
-	// .onEvent( e => {
-	// 	console.log( '\t[Event]', e )
-	// })
 
-	service.start()
+	// this is the constructur, make sure it only runs once
+	if(once.current === false){
+		once.current = true
+
+		service.current = interpret(machine.withContext({
+			...machine.context,
+			notify, // passing side effect command to fsm
+		}))
+		.onTransition( state => {
+			// init event
+			if(state.changed === undefined) return
+
+			// DEBUG
+			if( state.changed === false ){
+				console.error(
+					`\n\n💣💣💣 [UNHANDLED EVENT]💣💣💣\nEvent=`,
+					state.event,
+
+					'\nState=',
+					state.value, state,
+
+					'\nContext=',
+					state.context,
+					'\n\n' )
+
+				return
+			}
+
+			console.log( '\n⬇️⬇️ - - - - - - - - - - -',  )
+			dumpState(state.value)
+			console.log( 'ctx=', state.context )
+			console.log( 'evt=', state.event )
+			console.log( '⬆️ - - - - - - - - - - -\n',  )
+
+			// re-render if the state changed
+			forceUpdate(x => x+1)
+		})
+
+		service.current.start()
+	}
+
+	// didMount
+	useEffect(() => {
+	  return () => {
+	    service.stop()
+	  }
+	}, [service.current])
 
 	return (
-		<MyContext.Provider value={{ state: service.state, send: service.send }}>
+		<MyContext.Provider value={{
+			state: service.current.state,
+			send: service.current.send
+		}}>
 			<App />
 		</MyContext.Provider>
 	)

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { randomId } from '../utils/helpers'
+import { randomId, random } from '../utils/helpers'
 
 // A Callback service
 // cb() let's up dispatch event to the parent
@@ -13,7 +13,7 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 		switch (evt.type) {
 
 			//
-			case 'loadItems':
+			case 'loadItemsService':
 
 				const fakeItem = () => {
 					const id = randomId()
@@ -27,40 +27,45 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				// instead of fetching data via API, we fake them here
 				const arr = [fakeItem(), fakeItem(), fakeItem()]
 
-				console.log( '\n撈完資料: ', arr )
+				console.log( '\nfetched: ', arr )
 
-				// randomly trigger happy and sorrow path to test both scenarios
-				if((new Date().getMilliseconds() % 2) == 0 ){
-					console.log( '\t模擬成功',  )
-					// if fetching succeeded
-					cb({
-						type: 'itemLoadSuccess',
-						data: arr,
-					})
-				} else {
-					console.log( '\t模擬失敗',  )
-					// if fetching failed, we trigger the sorrow path
-					cb({
-						type: 'itemLoadFail',
-						data: 'network error',
-					})
-				}
+				const t = random(300, 2000)
+				setTimeout(() => {
+
+					// for test only
+					// randomly trigger happy and sorrow path to test both scenarios
+					// if((t % 2) == 0 ){
+					if(true){
+					// if(false){
+						// if fetching succeeded
+						cb({
+							type: 'itemLoadSuccess',
+							data: arr,
+						})
+					} else {
+						// if fetching failed, we trigger the sorrow path
+						cb({
+							type: 'itemLoadFail',
+							data: 'network error',
+						})
+					}
+				}, random(100, 1000))
 
 				break
 
-			case 'itemDeleteConfirm':
+			case 'itemDeleteConfirmService':
 				const item = evt.data
 
 				new Promise((resolve, reject) => {
 					setTimeout(() => {
-						resolve({
-							info: `item: ${item.id} deleted succesfully`,
-						})
-
-						// reject({
-						// 	info: `item: ${item.id} removal failed`,
-						// 	payload: item,
+						// resolve({
+						// 	info: `item: ${item.id} deleted succesfully`,
 						// })
+
+						reject({
+							info: `item: ${item.id} removal failed`,
+							payload: item,
+						})
 					}, 1200)
 				})
 
@@ -81,7 +86,7 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 				break
 
-			case 'createItems':
+			case 'createItemsService':
 				const localItem = evt.payload
 
 				// 操作 async side effect

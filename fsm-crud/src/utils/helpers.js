@@ -66,3 +66,26 @@ export const random = (min=0, max=999) => {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+
+export function stateValuesEqual(a, b) {
+  if (a === b) {
+    return true;
+  }
+
+  if (a === undefined || b === undefined) {
+    return false;
+  }
+
+  if (isString(a) || isString(b)) {
+    return a === b;
+  }
+
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+
+  return (
+    aKeys.length === bKeys.length &&
+    aKeys.every(key => stateValuesEqual(a[key], b[key]))
+  );
+}

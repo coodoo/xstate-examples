@@ -6,7 +6,6 @@ export const fsm = {
 		items: [],
 		selectedItemId: null,
 		modalData: null,
-		notifications: [],
 	},
 
 	// main | global
@@ -30,16 +29,6 @@ export const fsm = {
 					// when entrying 'entry' state, run 'reloadItems' action
 					// which will send an event to 'ItemService' to fetch data via API
 					entry: 'reloadItems',
-					on: {
-						itemLoadSuccess: {
-							target: 'master',
-							actions: 'listDataSuccess',
-						},
-						itemLoadFail: {
-							target: 'loadFailed',
-							actions: 'listDataError',
-						},
-					}
 				},
 
 				'loadFailed': {
@@ -140,7 +129,17 @@ export const fsm = {
 			// main - top level events
 			on: {
 				itemReload: {
-					actions: 'reloadItems',
+					target: '.loading',
+				},
+
+				// shared by both 'loading' and 'master' states, hence moved up one level here
+				itemLoadSuccess: {
+					target: '.master',
+					actions: 'listDataSuccess',
+				},
+				itemLoadFail: {
+					target: '.loadFailed',
+					actions: 'listDataError',
 				},
 
 				itemNew: {
