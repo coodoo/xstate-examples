@@ -1,5 +1,5 @@
 
-This is a typical CRUD applicaiton with master|detail|modal screens.
+- This is a typical CRUD applicaiton with master|detail|modal screens.
 
 ## Goal
 
