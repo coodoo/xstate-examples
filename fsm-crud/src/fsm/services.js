@@ -39,13 +39,13 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 					// if(false){
 						// if fetching succeeded
 						cb({
-							type: 'itemLoadSuccess',
+							type: 'ITEM_LOAD_SUCCESS',
 							data: arr,
 						})
 					} else {
 						// if fetching failed, we trigger the sorrow path
 						cb({
-							type: 'itemLoadFail',
+							type: 'ITEM_LOAD_FAIL',
 							data: 'network error',
 						})
 					}
@@ -107,13 +107,13 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				})
 				.then(result => {
 					cb({
-						type: 'newItemSuccess',
+						type: 'NEW_ITEM_SUCCESS',
 						result,
 					})
 				})
 				.catch(error => {
 					cb({
-						type: 'newItemFail',
+						type: 'NEW_ITEM_FAIL',
 						error,
 					})
 				})
@@ -138,14 +138,14 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 					.then(result => {
 						console.log('cancelled?', cancelled)
 						cb({
-							type: 'modalDeleteItemSuccess',
+							type: 'MODAL_DELETE_ITEM_SUCCESS',
 							result,
 						})
 					})
 
 					.catch(error => {
 						cb({
-							type: 'modalDeleteItemFail',
+							type: 'MODAL_DELETE_ITEM_FAIL',
 							error,
 						})
 					})

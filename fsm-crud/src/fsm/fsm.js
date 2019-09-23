@@ -1,6 +1,5 @@
 export const fsm = {
-	id: 'MyApp',
-	initial: 'main',
+	id: 'Root',
 
 	context: {
 		items: [],
@@ -8,13 +7,9 @@ export const fsm = {
 		modalData: null,
 	},
 
-	// main | global
-	type: 'parallel',
-
-	// top level
+	initial: 'main',
 	states: {
 		main: {
-			initial: 'loading',
 
 			invoke: [
 				{
@@ -23,201 +18,302 @@ export const fsm = {
 				},
 			],
 
-			states: {
-				//
-				loading: {
-					// when entrying 'entry' state, run 'reloadItems' action
-					// which will send an event to 'ItemService' to fetch data via API
-					entry: 'reloadItems',
-				},
+			// meta: {
+			// 	// 由於 meta 只能存於 stateNode 身上，因此可用每個元素的 uid 為 key 來存 event/guard/action 的 meta 內容呀
+			// 	"#root.main:ITEM_NEW": {
+			// 		pos: [10, 20],
+			// 		line: [1, 22, 32, 44],
+			// 		notes: ['第一行文字唷'],
+			// 	}
+			// },
 
-				'loadFailed': {
+			on: {
+				ITEM_NEW: [
+					{
+						actions: [],
+						cond: undefined,
+						target: ['#Root.main.newItem'],
+					},
+				],
+				ITEM_EDIT: [
+					{
+						actions: [],
+						cond: undefined,
+						target: ['#Root.main.editItem'],
+					},
+				],
+				ITEM_DELETE: [
+					{
+						target: ['#Root.main.deleteItem'],
+						actions: [],
+					},
+				],
+			},
+
+			states: {
+
+				//
+				loadFailed: {
 					on: {
-						modalDataErrorClose: {
-							target: 'master',
-							actions: 'modalErrorDataClose',
-						},
-						modalDataErrorRetry: {
-							target: 'loading',
-							actions: 'modalErrorDataRetry',
-						},
-					}
+						MODAL_CLOSE: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.master'],
+							},
+						],
+						MODAL_RETRY: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.loading'],
+							},
+						],
+					},
+					states: {},
+					order: 0,
 				},
 
 				//
 				master: {
 					on: {
-						itemDetails: {
-							target: 'details',
-							actions: 'selectItem',
-						},
-						itemEdit: {
-							target: 'edit',
-							actions: 'setExitTo',
-						},
-
-						// Test: multiple request and cancellation
-						test: {
-							actions: 'testAction',
-						},
-						testResult: {
-							actions: 'testResultAction',
-						},
-						testError: {
-							actions: '',
-						},
+						ITEM_RELOAD: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.loading'],
+							},
+						],
+						ITEM_DETAILS: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.master'],
+							},
+						],
 					},
+					states: {},
+					order: 2,
 				},
 
 				//
 				details: {
 					on: {
-						itemEdit: {
-							target: 'edit',
-							actions: 'setExitTo',
-						},
-						itemBack: {
-							target: 'master',
-						},
-					},
-				},
-
-				//
-				new: {
-					on: {
-						// cancel an edit might lead back to master or detail screen, hence using a guard state to tell
-						newItemCancel: {
-							target: 'unknown',
-						},
-						newItemSubmit: {
-							target: 'master',
-							actions: ['preSubmitNewItem', 'submitNewItem'],
-						},
-					},
-				},
-
-				//
-				edit: {
-					on: {
-						editCancel: {
-							target: 'unknown',
-						},
-						editSubmit: {
-							target: 'details',
-							actions: 'editSubmit',
-						},
-					},
-				},
-
-				// for transient state, which will be transferred to next state immediately
-				unknown: {
-					on: {
-						'': [
+						ITEM_BACK: [
 							{
-								target: 'master',
-								cond: 'unknownMaster',
-							},
-							{
-								target: 'details',
-								cond: 'unknownDetails',
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.master'],
 							},
 						],
 					},
-				},
-			},
-
-			// main - top level events
-			on: {
-				itemReload: {
-					target: '.loading',
+					states: {},
+					order: 3,
 				},
 
-				// shared by both 'loading' and 'master' states, hence moved up one level here
-				itemLoadSuccess: {
-					target: '.master',
-					actions: 'listDataSuccess',
-				},
-				itemLoadFail: {
-					target: '.loadFailed',
-					actions: 'listDataError',
-				},
-
-				itemNew: {
-					target: '.new',
-					actions: 'createNewItem',
-				},
-
-				newItemSuccess: {
-					actions: 'newItemSuccess',
-				},
-
-				newItemFail: {
-					actions: 'newItemFail',
-				},
-
-				modalDeleteItemConfirm: {
-					target: '.master',
-					actions: ['confirmItemDelete', 'preDeleteItem'],
-				},
-
-				modalDeleteItemSuccess: {
-					actions: 'modalDeleteItemSuccess',
-				},
-
-				modalDeleteItemFail: {
-					actions: 'modalDeleteItemFail',
-				},
-
-				clearNotification: {
-					actions: 'clearNotification',
-				},
-
-				testMe: {
-					actions: 'testMe',
-				},
-			},
-		},
-
-		global: {
-			type: 'parallel',
-			states: {
-				// p1 - selection
-				selection: {
-					initial: 'unSelected',
-					states: {
-						selected: {},
-						unSelected: {},
-					},
+				//
+				optimisticPending: {
 					on: {
-						itemSelect: {
-							target: '.selected',
-							actions: 'selectItem',
-						},
-						modalDeleteItemConfirm: '.unSelected',
+						NEW_ITEM_SUCCESS: [
+							{
+								actions: [
+									{
+										type: 'updateItem',
+										exec: undefined,
+									},
+								],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+						NEW_ITEM_FAIL: [
+							{
+								actions: [
+									{
+										type: 'restoreItem',
+										exec: undefined,
+									},
+								],
+								cond: undefined,
+								target: ['#Root.main.master'],
+							},
+						],
+						EDIT_ITEM_SUCCESS: [
+							{
+								actions: [
+									{
+										type: 'updateItem',
+										exec: undefined,
+									},
+								],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+						EDIT_ITEM_FAIL: [
+							{
+								actions: [
+									{
+										type: 'restoreItem',
+										exec: undefined,
+									},
+								],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+						DELETE_ITEM_SUCCESS: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+						DELETE_ITEM_FAIL: [
+							{
+								actions: [
+									{
+										type: 'restoreItem',
+										exec: undefined,
+									},
+								],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
 					},
+					states: {},
+					order: 0,
 				},
 
-				// p2 - modal
-				modal: {
-					initial: 'hide',
-					states: {
-						show: {},
-						hide: {},
-					},
+				//
+				newItem: {
 					on: {
-						itemDelete: {
-							target: '.show',
-							actions: 'itemDelete',
-						},
-						modalDeleteItemConfirm: '.hide',
-						modalDeleteItemCancel: {
-							target: '.hide',
-							actions: ['cancelItemDelete'],
-						},
+						NEW_ITEM_CANCEL: [
+							{
+								actions: [],
+								cond: {
+									name: 'backToMaster',
+									predicate: undefined,
+								},
+								target: ['#Root.main.master'],
+							},
+							{
+								target: ['#Root.main.details'],
+								actions: [],
+								cond: {
+									name: 'backToDetails',
+									predicate: undefined,
+								},
+							},
+						],
+						NEW_ITEM_SUBMIT: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
 					},
+					states: {},
+					order: 4,
+				},
+
+				//
+				editItem: {
+					on: {
+						EDIT_ITEM_CANCEL: [
+							{
+								actions: [],
+								cond: {
+									name: 'backToMaster',
+									predicate: undefined,
+								},
+								target: ['#Root.main.master'],
+							},
+							{
+								target: ['#Root.main.details'],
+								actions: [],
+								cond: {
+									name: 'backToDetails',
+									predicate: undefined,
+								},
+							},
+						],
+						EDIT_ITEM_SUBMIT: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+					},
+					states: {},
+					order: 6,
+				},
+
+				//
+				deleteItem: {
+					on: {
+						modalConfirm: [
+							{
+								actions: [],
+								cond: undefined,
+								target: ['#Root.main.optimisticPending'],
+							},
+						],
+						modalCancel: [
+							{
+								actions: [],
+								cond: {
+									name: 'backToMaster',
+									predicate: undefined,
+								},
+								target: ['#Root.main.master'],
+							},
+							{
+								target: ['#Root.main.details'],
+								actions: [],
+								cond: {
+									name: 'backToDetails',
+									predicate: undefined,
+								},
+							},
+						],
+					},
+					states: {},
+					order: 7,
+				},
+
+				//
+				loading: {
+					on: {
+						ITEM_LOAD_FAIL: [
+							{
+								actions: [],
+								target: ['#Root.main.loadFailed'],
+							},
+						],
+						ITEM_LOAD_SUCCESS: [
+							{
+								actions: ['listDataSuccess'],
+								target: ['#Root.main.master'],
+							},
+						],
+					},
+					states: {},
+					order: 1,
+					entry: [
+						{
+							type: 'reloadItems',
+							exec: undefined,
+						},
+					],
 				},
 			},
+			order: 2,
+			initial: 'loading',
 		},
 	},
+	on: {},
 }
-
