@@ -89,3 +89,5 @@ export function stateValuesEqual(a, b) {
     aKeys.every(key => stateValuesEqual(a[key], b[key]))
   );
 }
+
+export const getItemById = (items, id) => items.find(it => it.id === id)

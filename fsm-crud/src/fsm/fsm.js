@@ -4,12 +4,15 @@ export const fsm = {
 	context: {
 		items: [],
 		selectedItemId: null,
+		opFrom: null, // master|details
 		modalData: null,
 	},
 
 	type: 'parallel',
 
 	states: {
+
+		//
 		main: {
 
 			invoke: [
@@ -19,34 +22,69 @@ export const fsm = {
 				},
 			],
 
-			// meta: {
-			// 	// 由於 meta 只能存於 stateNode 身上，因此可用每個元素的 uid 為 key 來存 event/guard/action 的 meta 內容呀
-			// 	"#root.main:ITEM_NEW": {
-			// 		pos: [10, 20],
-			// 		line: [1, 22, 32, 44],
-			// 		notes: ['第一行文字唷'],
-			// 	}
-			// },
-
+			// Root.main
 			on: {
 				ITEM_NEW: [
 					{
-						actions: [],
 						target: ['#Root.main.newItem'],
+						actions: ['createItem'],
 					},
 				],
 				ITEM_EDIT: [
 					{
-						actions: [],
 						target: ['#Root.main.editItem'],
+						actions: ['editItem'],
 					},
 				],
 				ITEM_DELETE: [
 					{
 						target: ['#Root.main.deleteItem'],
-						actions: [],
+						actions: ['deleteItem'],
 					},
 				],
+
+				// optimistic result - delete item
+				OPTIMISTIC_DELETE_ITEM_SUCCESS: [
+					{
+						target: ['#Root.main.master', '#Root.global.selection.unSelected'],
+						actions: 'deleteOptimisticItemSuccess',
+					},
+				],
+				OPTIMISTIC_DELETE_ITEM_FAIL: [
+					{
+						target: ['#Root.main.master', '#Root.global.selection.selected'],
+						actions: 'restoreOptimisticDeleteItem',
+					},
+				],
+
+				// optimistic result - create item
+				OPTIMISTIC_CREATE_ITEM_SUCCESS: [
+					{
+						target: ['#Root.main.master'],
+						actions: 'createOptimisticItemSuccess',
+					},
+				],
+				OPTIMISTIC_CREATE_ITEM_FAIL: [
+					{
+						target: ['#Root.main.master'],
+						actions: 'restoreOptimisticNewItem',
+					},
+				],
+
+				// optimistic result - edit item
+				OPTIMISTIC_EDIT_ITEM_SUCCESS: [
+					{
+						target: ['#Root.main.master'],
+						actions: 'editOptimisticItemSuccess',
+					},
+				],
+				OPTIMISTIC_EDIT_ITEM_FAIL: [
+					{
+						target: ['#Root.main.master'],
+						actions: 'restoreOptimisticEditItem',
+					},
+				],
+
 			},
 
 			states: {
@@ -59,13 +97,13 @@ export const fsm = {
 						},
 					],
 					on: {
-						ITEM_LOAD_FAIL: [
+						LOAD_ITEM_FAIL: [
 							{
 								actions: ['listDataError'],
 								target: ['#Root.main.loadFailed'],
 							},
 						],
-						ITEM_LOAD_SUCCESS: [
+						LOAD_ITEM_SUCCESS: [
 							{
 								actions: ['listDataSuccess'],
 								target: ['#Root.main.master'],
@@ -110,12 +148,6 @@ export const fsm = {
 								actions: [],
 							},
 						],
-						// ITEM_SELECT: [
-						// 	{
-						// 		target: ['#Root.main.master'],
-						// 		actions: ['selectItem'],
-						// 	},
-						// ],
 					},
 					states: {},
 					order: 2,
@@ -136,173 +168,87 @@ export const fsm = {
 				},
 
 				//
-				optimisticPending: {
-					on: {
-						NEW_ITEM_SUCCESS: [
-							{
-								actions: [
-									{
-										type: 'updateItem',
-									},
-								],
-								target: ['#Root.main.optimisticPending'],
-							},
-						],
-						NEW_ITEM_FAIL: [
-							{
-								actions: [
-									{
-										type: 'restoreItem',
-									},
-								],
-								target: ['#Root.main.master'],
-							},
-						],
-						EDIT_ITEM_SUCCESS: [
-							{
-								actions: [
-									{
-										type: 'updateItem',
-									},
-								],
-								target: ['#Root.main.optimisticPending'],
-							},
-						],
-						EDIT_ITEM_FAIL: [
-							{
-								actions: [
-									{
-										type: 'restoreItem',
-									},
-								],
-								target: ['#Root.main.optimisticPending'],
-							},
-						],
-						DELETE_ITEM_SUCCESS: [
-							{
-								actions: [],
-								target: ['#Root.main.optimisticPending'],
-							},
-						],
-						DELETE_ITEM_FAIL: [
-							{
-								actions: [
-									{
-										type: 'restoreItem',
-									},
-								],
-								target: ['#Root.main.optimisticPending'],
-							},
-						],
-					},
-					states: {},
-					order: 0,
-				},
-
-				//
 				newItem: {
 					on: {
 						NEW_ITEM_CANCEL: [
 							{
 								actions: [],
-								cond: {
-									name: 'backToMaster',
-									predicate: undefined,
-								},
+								cond: 'backToMaster',
 								target: ['#Root.main.master'],
 							},
 							{
 								target: ['#Root.main.details'],
 								actions: [],
-								cond: {
-									name: 'backToDetails',
-									predicate: undefined,
-								},
+								cond: 'backToDetails',
 							},
 						],
 						NEW_ITEM_SUBMIT: [
 							{
-								actions: [],
-								target: ['#Root.main.optimisticPending'],
+								target: ['#Root.main.master'],
+								actions: ['localCreateNewItem', 'remoteCreateNewItem'],
 							},
 						],
 					},
-					states: {},
-					order: 4,
 				},
 
 				//
 				editItem: {
 					on: {
-						EDIT_ITEM_CANCEL: [
+						ITEM_EDIT_CANCEL: [
 							{
 								actions: [],
-								cond: {
-									name: 'backToMaster',
-									predicate: undefined,
-								},
+								cond: 'backToMaster',
 								target: ['#Root.main.master'],
 							},
 							{
 								target: ['#Root.main.details'],
 								actions: [],
-								cond: {
-									name: 'backToDetails',
-									predicate: undefined,
-								},
+								cond: 'backToDetails',
 							},
 						],
-						EDIT_ITEM_SUBMIT: [
+						ITEM_EDIT_SUBMIT: [
 							{
-								actions: [],
-								target: ['#Root.main.optimisticPending'],
+								target: ['#Root.main.master'],
+								actions: ['localEditItem', 'remoteEditItem'],
 							},
 						],
 					},
-					states: {},
-					order: 6,
 				},
 
-				//
+				// show confirmation modal
 				deleteItem: {
 					on: {
 						MODAL_ITEM_DELETE_CONFIRM: [
 							{
-								target: ['#Root.main.optimisticPending'],
-								actions: ['modalReset'],
+								target: ['#Root.main.master'],
+								actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
 							},
 						],
 						MODAL_ITEM_DELETE_CANCEL: [
 							{
-								cond: {
-									name: 'backToMaster',
-									predicate: undefined,
-								},
 								target: ['#Root.main.master'],
+								cond: 'backToMaster',
 								actions: ['modalReset'],
 							},
 							{
 								target: ['#Root.main.details'],
-								cond: {
-									name: 'backToDetails',
-									predicate: undefined,
-								},
+								cond: 'backToDetails',
 								actions: ['modalReset'],
 							},
 						],
 					},
-					states: {},
-					order: 7,
 				},
 
 			},
-			order: 2,
 			initial: 'loading',
 		},
 
 		global: {
-			initial: 'selection',
+
+			type: 'parallel',
+
 			states: {
+				//
 				selection: {
 					initial: 'unSelected',
 					states: {
@@ -316,7 +262,6 @@ export const fsm = {
 						},
 					},
 				},
-
 			},
 		},
 	},

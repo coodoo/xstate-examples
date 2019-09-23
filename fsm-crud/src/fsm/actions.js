@@ -1,62 +1,40 @@
 /* eslint-disable */
 import { send, assign } from 'xstate'
+import { getItemById } from '../utils/helpers'
 import toaster from 'toasted-notes'
 import 'toasted-notes/src/styles.css'
 
-// helper: toaster as a side effect
+// helper: toaster invocation as a side effect
 const notify = msg => toaster.notify(msg, {
-		position: 'bottom-right',
-	})
+	position: 'bottom-right',
+})
 
-//
+/* read item
+-------------------------------------------------- */
+
 export const reloadItems = send(
-	{ type: 'ServiceLoadItems' }, // the event to be sent
+	{ type: 'SERVICE.LOAD.ITEMS' }, // the event to be sent
 	{ to: 'ItemService' }, // the target servcie to receive that event
 )
 
 export const listDataSuccess = assign((ctx, evt) => {
-	// console.log( '[listDataSuccess]', evt )
 	ctx.items = evt.data
-	notify('Data fetched 1')
-	// ctx.notify('Data fetched 2')
-	// ctx.notify('Data fetched 3')
 })
 
 export const listDataError = assign((ctx, e) => {
-	console.log('\n[listDataError]', e.data)
-	//
 	ctx.modalData = {
 		type: 'MODAL_ERROR',
-		title: 'ListData Fetching Failed',
-		content: `Failed for reason: ${e.data}`,
+		title: 'Fetching list data failed.',
+		content: `Details: ${e.data}`,
 		data: e.data,
 	}
 })
 
-// ok
-export const selectItem = assign((ctx, e) => {
-	ctx.selectedItemId = e.item.id
-	ctx.selectedFrom = e.from // was exitNewItemTo
-})
-
-export const setExitTo = assign((ctx, e) => {
-	ctx.exitNewItemTo = e.exitTo
-})
-
-export const confirmItemDelete = send(
-	// notify ItemService to delete item and dispatch once the job is completed
-	(ctx, e) => {
-		return {
-			type: 'ServiceItemDeleteConfirm',
-			data: e.data,
-		}
-	},
-	// this is 2nd arguement, not part of the Event{}
-	{ to: 'ItemService' },
-)
+/* delete item
+-------------------------------------------------- */
 
 // optimistic update
-export const preDeleteItem = assign((ctx, e) => {
+export const localDeleteItem = assign((ctx, e) => {
 	const selectedItemId = e.data.id
 	const newItems = ctx.items.filter(it => it.id !== selectedItemId)
 	ctx.items = newItems
@@ -64,84 +42,147 @@ export const preDeleteItem = assign((ctx, e) => {
 	ctx.modalData = null
 })
 
+export const remoteDeleteItem = send(
+	// notify ItemService to delete item and dispatch once the job is completed
+	(ctx, e) => {
+		return {
+			type: 'SERVICE.DELETE.ITEM',
+		}
+	},
+	// this is 2nd arguement, not part of the Event{}
+	{ to: 'ItemService' },
+)
+
+
 //
 export const cancelItemDelete = assign((ctx, e) => {
 	ctx.modalData = null
 })
 
-export const modalDeleteItemFail = assign((ctx, e) => {
+// ok
+export const restoreOptimisticDeleteItem = assign((ctx, e) => {
 	const { info, payload } = e.error
 	const restoreItem = payload
-	// console.log( '[MODAL_DELETE_ITEM_FAIL]', info )
 	ctx.items.push(restoreItem)
-	ctx.notify(info)
+	notify(info)
 })
 
-export const modalDeleteItemSuccess = assign((ctx, e) => {
-	console.log('[MODAL_DELETE_ITEM_RESULT]', e)
+// ok
+export const deleteOptimisticItemSuccess = assign((ctx, e) => {
 	const { result } = e
-	ctx.notify(result.info)
-})
-
-// 關閉 modal 窗時清空 ctx.modalData 內容
-export const modalReset = assign((ctx, e) => {
-	ctx.modalData = null
-	// ctx.notify('Loading Error dismissed')
+	notify(result.info)
 })
 
 
-export const createNewItem = assign((ctx, e) => {
+/* create item
+-------------------------------------------------- */
+
+// ok
+export const createItem = assign((ctx, e) => {
+	const { from } = e
 	// config which screen to exit to from creating new item screen
-	ctx.exitNewItemTo = e.exitTo
+	ctx.opFrom = from
 })
 
-// optimistic update, insert the item with local id
-export const preSubmitNewItem = assign((ctx, e) => {
+// ok, optimistic update, insert the item with local id
+export const localCreateNewItem = assign((ctx, e) => {
 	const newItem = e.payload
 	ctx.items.push(newItem)
 	ctx.selectedItemId = newItem.id
 })
 
-// then invoke service to persist new item via external api call
-export const submitNewItem = send(
+// ok, then invoke service to persist new item via external api call
+export const remoteCreateNewItem = send(
 	(ctx, e) => ({
-		type: 'ServiceCreateItems',
+		type: 'SERVICE.CREATE.ITEM',
 		payload: e.payload,
-		forceFail: e.forceFail,
 	}),
 	{ to: 'ItemService' },
 )
 
-// after data was persisted to server, replace local item id with the official one sent back from the server
-export const newItemSuccess = assign((ctx, e) => {
-	const {
-		result: { info, serverItem, localItem },
-	} = e
-	// console.log( '[NEW_ITEM_SUCCESS]', serverItem )
-
+// ok, update item with server returned from server when optimistic adding succeeded
+export const createOptimisticItemSuccess = assign((ctx, e) => {
+	const { info, serverItem, localItem } = e.result
+	notify(info)
 	ctx.items = ctx.items.map(it => (it.id === localItem.id ? serverItem : it))
-
-	ctx.notify(info)
-
 	ctx.selectedItemId = serverItem.id
-
-	ctx.exitNewItemTo = null
-
+	ctx.opFrom = null
 })
 
-export const newItemFail = assign((ctx, e) => {
+// ok, resotre item when optimistic adding new item failed
+export const restoreOptimisticNewItem = assign((ctx, e) => {
 	const { info, localItem } = e.error
-	// console.log('NEW_ITEM_FAIL', info)
 	ctx.items = ctx.items.filter(it => it.id !== localItem.id)
-	ctx.notify(info)
+	notify(info)
 	ctx.selectedItemId = null
-	ctx.exitNewItemTo = null
+	ctx.opFrom = null
 })
 
-export const editSubmit = assign((ctx, e) => {
+
+/* edit item
+-------------------------------------------------- */
+
+// ok
+export const editItem = assign((ctx, e) => {
+	const { from } = e
+	// config which screen to exit to from creating new item screen
+	ctx.opFrom = from
+})
+
+// ok, optimistic update, insert the item with local id
+export const localEditItem = assign((ctx, e) => {
 	const edited = e.payload
 	ctx.items = ctx.items.map(it => (it.id === edited.id ? edited : it))
+	ctx.selectedItemId = edited.id
+	ctx.opFrom = null
 })
+
+// ok: then invoke service to persist new item via external api call
+export const remoteEditItem = send(
+	(ctx, e) => ({
+		type: 'SERVICE.EDIT.ITEM',
+		editedItem: e.payload,
+		oldItem: e.oldItem,
+	}),
+	{ to: 'ItemService' },
+)
+
+// ok: update item with server returned from server when optimistic adding succeeded
+export const editOptimisticItemSuccess = assign((ctx, e) => {
+	const { info, editedItem } = e.result
+	notify(info)
+	// replace local item with the one from server, maybe some of it's content had changed
+	ctx.items = ctx.items.map(it => (it.id === editedItem.id ? editedItem : it))
+	ctx.selectedItemId = editedItem.id
+	ctx.opFrom = null
+})
+
+// ok: resotre item when optimistic adding new item failed
+export const restoreOptimisticEditItem = assign((ctx, e) => {
+	const { info, oldItem } = e.error
+	ctx.items = ctx.items.map(it => it.id === oldItem.id ? oldItem : it)
+	notify(info)
+	ctx.selectedItemId = oldItem.id
+	ctx.opFrom = null
+})
+
+
+/* misc
+-------------------------------------------------- */
+
+// ok
+export const selectItem = assign((ctx, e) => {
+	ctx.selectedItemId = e.item.id
+})
+
+// ok
+export const modalReset = assign((ctx, e) => {
+	ctx.modalData = null
+})
+
+
+/* +TBD
+-------------------------------------------------- */
 
 export const clearNotification = assign((ctx, e) => {
 	ctx.notifications = ctx.notifications.filter(it => !e.popped.includes(it))
@@ -163,18 +204,22 @@ export const testMe = assign((ctx, e) => {
 	console.log('[subMachine]', e)
 })
 
-export const itemDelete = assign((ctx, e) => {
+// update ctx.modalData
+export const deleteItem = assign((ctx, e) => {
+	const { from } = e
+	const { items, selectedItemId } = ctx
+	const target = getItemById( items, selectedItemId )
 
-	const { target } = e
-
-debugger	// ctx.selectedItemId
+	//
 	const modalData = {
 		type: 'MODAL_DELETE',
 		title: 'Item Removal Confirmation',
 		content: `Are you sure to delete ${target.label}?`,
 		data: target,
-		exitModalTo: 'master',
 	}
-	ctx.modalData = e.modalData
+
+	// remark the op was triggered by master screen, so we when later cancelled we know where to go back to
+	ctx.opFrom = from
+	ctx.modalData = modalData
 })
 

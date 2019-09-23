@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { randomId, random } from '../utils/helpers'
+import { randomId, random, getItemById } from '../utils/helpers'
 
 // A Callback service
 // cb() let's up dispatch event to the parent
@@ -13,7 +13,7 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 		switch (evt.type) {
 
 			//
-			case 'ServiceLoadItems':
+			case 'SERVICE.LOAD.ITEMS':
 				const fakeItem = () => {
 					const id = randomId()
 					const d = {
@@ -33,18 +33,18 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 					// for test only
 					// randomly trigger happy and sorrow path to test both scenarios
-					// if((t % 2) == 0 ){
-					if(true){
+					if((t % 2) == 0 ){
+					// if(true){
 					// if(false){
 						// if fetching succeeded
 						cb({
-							type: 'ITEM_LOAD_SUCCESS',
+							type: 'LOAD_ITEM_SUCCESS',
 							data: arr,
 						})
 					} else {
-						// if fetching failed, we trigger the sorrow path
+						// if fetching failed, trigger the sorrow path
 						cb({
-							type: 'ITEM_LOAD_FAIL',
+							type: 'LOAD_ITEM_FAIL',
 							data: 'network error',
 						})
 					}
@@ -52,17 +52,21 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 				break
 
-			case 'ServiceItemDeleteConfirm':
-				const item = evt.data
+			case 'SERVICE.DELETE.ITEM':
+				const { selectedItemId } = ctx
+				const item = getItemById(ctx.items, selectedItemId)
 
 				new Promise((resolve, reject) => {
 					setTimeout(() => {
+
+						// happy path
 						resolve({
-							info: `item: ${item.id} deleted succesfully`,
+							info: `${selectedItemId} deleted succesfully from the server`,
 						})
 
+						// sorrow path
 						// reject({
-						// 	info: `item: ${item.id} removal failed`,
+						// 	info: `Delete ${selectedItemId} from server failed, data restored.`,
 						// 	payload: item,
 						// })
 					}, 1200)
@@ -70,13 +74,13 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				.then(result => {
 					// console.log( '\tconfirmHandler completed: ', result )
 					cb({
-						type: 'modalDeleteItemSuccess',
+						type: 'OPTIMISTIC_DELETE_ITEM_SUCCESS',
 						result,
 					})
 				})
 				.catch(error => {
 					cb({
-						type: 'modalDeleteItemFail',
+						type: 'OPTIMISTIC_DELETE_ITEM_FAIL',
 						error,
 					})
 				})
@@ -84,35 +88,75 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 				break
 
 			// create new item
-			case 'ServiceCreateItems':
+			case 'SERVICE.CREATE.ITEM':
 				const localItem = evt.payload
 
 				// async side effect
 				return new Promise((resolve, reject) => {
 
-					// simulate id generated from server, to replace the temp local id
+					// simulate id generated from server, to replace the temporary local id
 					const serverId = 'server_' + localItem.id.split('tmp_')[1]
 					setTimeout(() => {
+
+						// happy path
 						resolve({
-							info: `item: ${localItem.id} - ${localItem.label} created succesfully`,
+							info: `${localItem.id} - ${localItem.label} created succesfully on the server`,
 							serverItem: { ...localItem, id: serverId },
 							localItem,
 						})
+
+						// sorrow path
 						// reject({
-						// 	info: `Create item: ${localItem.id} failed`,
+						// 	info: `Create item: ${localItem.id} on server failed, data restored`,
 						// 	localItem,
 						// })
 					}, 1000)
 				})
 				.then(result => {
 					cb({
-						type: 'NEW_ITEM_SUCCESS',
+						type: 'OPTIMISTIC_CREATE_ITEM_SUCCESS',
 						result,
 					})
 				})
 				.catch(error => {
 					cb({
-						type: 'NEW_ITEM_FAIL',
+						type: 'OPTIMISTIC_CREATE_ITEM_FAIL',
+						error,
+					})
+				})
+
+			// edit item
+			case 'SERVICE.EDIT.ITEM':
+
+				const { editedItem, oldItem } = evt
+				// async side effect
+				return new Promise((resolve, reject) => {
+
+					setTimeout(() => {
+						// happy path
+						// simulating itm returned from server has added props
+						editedItem.modifiedDate = new Date()
+						resolve({
+							info: `${editedItem.id} - ${editedItem.label} edited succesfully on the server`,
+							editedItem,
+						})
+
+						// sorrow path
+						// reject({
+						// 	info: `Edit item: ${oldItem.id} on server failed, data restored`,
+						// 	oldItem,
+						// })
+					}, 1000)
+				})
+				.then(result => {
+					cb({
+						type: 'OPTIMISTIC_EDIT_ITEM_SUCCESS',
+						result,
+					})
+				})
+				.catch(error => {
+					cb({
+						type: 'OPTIMISTIC_EDIT_ITEM_FAIL',
 						error,
 					})
 				})

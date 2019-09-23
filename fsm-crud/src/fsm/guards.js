@@ -1,2 +1,2 @@
-export const unknownMaster = ctx => ctx.exitNewItemTo === 'master'
-export const unknownDetails =  ctx => ctx.exitNewItemTo === 'details'
+export const backToMaster = ctx => ctx.opFrom === 'master'
+export const backToDetails = ctx => ctx.opFrom === 'details'

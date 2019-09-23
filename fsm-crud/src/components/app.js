@@ -4,11 +4,19 @@ import React, { useEffect, useState, useRef, useContext, memo } from 'react'
 import { useMachine, useService } from '@xstate/react'
 import { interpret } from 'xstate'
 import { machine, } from '../fsm/machine'
-import { randomId, dumpState, stateValuesEqual } from '../utils/helpers'
+import { randomId, dumpState, stateValuesEqual, getItemById } from '../utils/helpers'
 
 import styled, { createGlobalStyle } from 'styled-components'
 
 import '../components/styles.css'
+
+import toaster from 'toasted-notes'
+import 'toasted-notes/src/styles.css'
+
+// helper: toaster as a side effect
+const notify = msg => toaster.notify(msg, {
+	position: 'bottom-right',
+})
 
 // import whyDidYouRender from '@welldone-software/why-did-you-render'
 // whyDidYouRender(React)
@@ -28,8 +36,7 @@ const StyledModal = styled.div`
 //
 const ModalError = props => {
 	const { send } = useContext(MyContext)
-	const { title, content } = props
-
+	const { title, content } = props.modalData
 	return (
 		<StyledModal>
 			<div>Title: {title}</div>
@@ -48,9 +55,9 @@ const ModalError = props => {
 
 //
 const ModalDelete = props => {
-	const { send } = useContext(MyContext)
-	const { title, content, data } = props
 
+	const { send } = useContext(MyContext)
+	const { title, content, data } = props.modalData
 	return (
 		<StyledModal>
 			<div>Title: {title}</div>
@@ -86,19 +93,25 @@ const ItemNew = props => {
 	const [content, setContent] = useState('')
 
 	const handleSubmit = () => {
+
+		if(content === '') {
+			notify('Input can not be empty')
+			return
+		}
+
 		const newItem = {
 			id: `tmp_${randomId()}`,
 			label: `Label_${content}`,
 		}
 
 		send({
-			type: 'newItemSubmit',
+			type: 'NEW_ITEM_SUBMIT',
 			payload: newItem,
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'newItemCancel' })
+		send({ type: 'NEW_ITEM_CANCEL' })
 	}
 
 	const handleChange = e => {
@@ -125,18 +138,18 @@ const ItemNew = props => {
 const ItemEdit = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
-	const { id, label } = getItemById(items, selectedItemId)
-	const [content, setContent] = useState(label)
-
+	const oldItem = getItemById(items, selectedItemId)
+	const [content, setContent] = useState(oldItem.label)
 	const handleSubmit = () => {
 		send({
-			type: 'editSubmit',
-			payload: { id, label: content },
+			type: 'ITEM_EDIT_SUBMIT',
+			payload: { id: oldItem.id, label: content },
+			oldItem,
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'editCancel' })
+		send({ type: 'ITEM_EDIT_CANCEL' })
 	}
 
 	const handleChange = e => {
@@ -171,19 +184,10 @@ const Details = props => {
 	const { id, label } = selectedItem
 
 	const handleDelete = () => {
-		// prepare modal data to be displayed
-		const modalData = {
-			type: 'MODAL_DELETE',
-			title: 'Item Removal Confirmation',
-			content: `Are you sure to delete ${selectedItem.label}?`,
-			data: selectedItem,
-			exitModalTo: 'details',
-		}
-
 		// then dispatch the modal data
 		send({
 			type: 'itemDelete',
-			modalData,
+			from: 'details',
 		})
 	}
 
@@ -214,13 +218,10 @@ const Listing = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
 
-	const handleDelete = itm => {
-		const target = itm ? itm : getItemById(items, selectedItemId)
-
-		//
+	const handleDelete = () => {
 		send({
 			type: 'ITEM_DELETE',
-			target,
+			from: 'master'
 		})
 	}
 
@@ -258,6 +259,21 @@ const Listing = props => {
 
 	const btnEnabled = state.matches('global.selection.selected')
 
+	const handleCreateItem = itm => {
+		send({
+			type: 'ITEM_NEW',
+			from: 'master', // click 'cancel' will go back to listing screen
+		})
+	}
+
+	const handleEditItem = itm => {
+		send({
+			type: 'ITEM_EDIT',
+			from: 'master'
+		})
+	}
+
+
 	return (
 		<div>
 
@@ -267,19 +283,14 @@ const Listing = props => {
 
 			<button
 				id='btnAdd'
-				onClick={() =>
-					send({
-						type: 'itemNew',
-						exitTo: 'master', // click 'cancel' will go back to listing screen
-					})
-				}
+				onClick={handleCreateItem}
 			>
 				New
 			</button>
 
 			<button
 				id='btnEdit'
-				onClick={() => send({ type: 'itemEdit', exitTo: 'master' })}
+				onClick={handleEditItem}
 				disabled={!btnEnabled}
 			>
 				Edit
@@ -287,7 +298,7 @@ const Listing = props => {
 
 			<button
 				id='btnRemove'
-				onClick={() => handleDelete(null)}
+				onClick={handleDelete}
 				disabled={!btnEnabled}
 			>
 				Remove
@@ -295,35 +306,11 @@ const Listing = props => {
 
 			<button
 				id='btnReload'
-				onClick={() => send({ type: 'itemReload' })}
+				onClick={() => send({ type: 'ITEM_RELOAD' })}
 			>
 				Reload
 			</button>
 
-			{/*<button
-				id='btnTest'
-				onClick={() => {
-
-					// this is to show request could be cancelled any time, using one of following two approaches
-
-					// might as well use DOM api
-					// if(signal.current)
-					// 	signal.current.abort()
-					// const controller = new AbortController()
-					// signal.current = controller
-					// send({ type: test, signal: signal.current.signal })
-
-					// cancel previous request first
-					if(signal.current)
-						signal.current.cancel = true
-
-					// then send next request
-					signal.current = { cancel: false }
-					send({ type: 'test', signal: signal.current })
-				}}
-			>
-				Test
-			</button>*/}
 		</div>
 	)
 }
@@ -341,10 +328,10 @@ const getModal = () => {
 
 	switch (modalData.type) {
 		case 'MODAL_DELETE':
-			modal = <ModalDelete {...modalData} />
+			modal = <ModalDelete modalData={modalData} />
 			break
 		case 'MODAL_ERROR':
-			modal = <ModalError {...modalData} />
+			modal = <ModalError modalData={modalData} />
 			break
 		default:
 			modal = null
@@ -353,25 +340,18 @@ const getModal = () => {
 	return modal
 }
 
-// helper
-const getItemById = (items, id) => items.find(it => it.id === id)
 
 // main app
 const App = props => {
 	const { state, send } = useContext(MyContext)
 
-	console.log( '\nApp',  )
-
-	// console.log('\n[State] = ', state.value, '\n[context] = ', state.context)
-	// console.log('\n[context] = ', state.context)
-
-	const { notifications } = state.context
+	console.log( '\n[App run]',  )
 
 	const listing = !state.matches('main.master') ? null : <Listing />
 
-	const itemEdit = !state.matches('main.edit') ? null : <ItemEdit />
+	const itemEdit = !state.matches('main.editItem') ? null : <ItemEdit />
 
-	const itemNew = !state.matches('main.new') ? null : <ItemNew />
+	const itemNew = !state.matches('main.newItem') ? null : <ItemNew />
 
 	const details = !state.matches('main.details') ? null : <Details />
 
@@ -382,11 +362,6 @@ const App = props => {
 		)
 
 	const modal = getModal()
-
-	// didMount
-	// useEffect(() => {
-	// 	return () => {}
-	// }, [])
 
 	return (
 		<div className="App">
@@ -400,7 +375,7 @@ const App = props => {
 	)
 }
 
-
+// Entry point
 export const Wrap = () => {
 
 	// console.log( '\nWrap run'  )
