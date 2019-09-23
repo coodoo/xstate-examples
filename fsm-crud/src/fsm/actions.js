@@ -1,5 +1,14 @@
+/* eslint-disable */
 import { send, assign } from 'xstate'
+import toaster from 'toasted-notes'
+import 'toasted-notes/src/styles.css'
 
+// helper: toaster as a side effect
+const notify = msg => toaster.notify(msg, {
+		position: 'bottom-right',
+	})
+
+//
 export const reloadItems = send(
 	{ type: 'ServiceLoadItems' }, // the event to be sent
 	{ to: 'ItemService' }, // the target servcie to receive that event
@@ -8,9 +17,9 @@ export const reloadItems = send(
 export const listDataSuccess = assign((ctx, evt) => {
 	// console.log( '[listDataSuccess]', evt )
 	ctx.items = evt.data
-	ctx.notify('Data fetched 1')
-	ctx.notify('Data fetched 2')
-	ctx.notify('Data fetched 3')
+	notify('Data fetched 1')
+	// ctx.notify('Data fetched 2')
+	// ctx.notify('Data fetched 3')
 })
 
 export const listDataError = assign((ctx, e) => {
@@ -24,9 +33,10 @@ export const listDataError = assign((ctx, e) => {
 	}
 })
 
+// ok
 export const selectItem = assign((ctx, e) => {
 	ctx.selectedItemId = e.item.id
-	ctx.exitNewItemTo = e.exitTo
+	ctx.selectedFrom = e.from // was exitNewItemTo
 })
 
 export const setExitTo = assign((ctx, e) => {
@@ -73,15 +83,12 @@ export const modalDeleteItemSuccess = assign((ctx, e) => {
 	ctx.notify(result.info)
 })
 
-export const modalErrorDataClose = assign((ctx, e) => {
+// 關閉 modal 窗時清空 ctx.modalData 內容
+export const modalReset = assign((ctx, e) => {
 	ctx.modalData = null
-	ctx.notify('Loading Error dismissed')
+	// ctx.notify('Loading Error dismissed')
 })
 
-export const modalErrorDataRetry = assign((ctx, e) => {
-	ctx.modalData = null
-	ctx.notify('Loading Error dismissed')
-})
 
 export const createNewItem = assign((ctx, e) => {
 	// config which screen to exit to from creating new item screen
@@ -157,6 +164,17 @@ export const testMe = assign((ctx, e) => {
 })
 
 export const itemDelete = assign((ctx, e) => {
+
+	const { target } = e
+
+debugger	// ctx.selectedItemId
+	const modalData = {
+		type: 'MODAL_DELETE',
+		title: 'Item Removal Confirmation',
+		content: `Are you sure to delete ${target.label}?`,
+		data: target,
+		exitModalTo: 'master',
+	}
 	ctx.modalData = e.modalData
 })
 

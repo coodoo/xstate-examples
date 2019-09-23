@@ -14,7 +14,6 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 			//
 			case 'ServiceLoadItems':
-
 				const fakeItem = () => {
 					const id = randomId()
 					const d = {

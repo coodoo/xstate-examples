@@ -1,7 +1,5 @@
 /* eslint-disable*/
 import React, { useEffect, useState, useRef, useContext, memo } from 'react'
-import toaster from 'toasted-notes'
-import 'toasted-notes/src/styles.css'
 
 import { useMachine, useService } from '@xstate/react'
 import { interpret } from 'xstate'
@@ -37,11 +35,11 @@ const ModalError = props => {
 			<div>Title: {title}</div>
 			<div>{content}</div>
 
-			<button onClick={e => send({ type: 'modalDataErrorRetry' })}>
+			<button onClick={e => send({ type: 'MODAL_ERROR_RETRY' })}>
 				Retry
 			</button>
 
-			<button onClick={e => send({ type: 'modalDataErrorClose' })}>
+			<button onClick={e => send({ type: 'MODAL_ERROR_CLOSE' })}>
 				Close
 			</button>
 		</StyledModal>
@@ -61,7 +59,7 @@ const ModalDelete = props => {
 			<button
 				onClick={() =>
 					send({
-						type: 'modalDeleteItemCancel',
+						type: 'MODAL_ITEM_DELETE_CANCEL',
 					})
 				}
 			>
@@ -71,7 +69,7 @@ const ModalDelete = props => {
 			<button
 				onClick={() =>
 					send({
-						type: 'modalDeleteItemConfirm',
+						type: 'MODAL_ITEM_DELETE_CONFIRM',
 						data,
 					})
 				}
@@ -197,7 +195,7 @@ const Details = props => {
 			<button
 				onClick={() =>
 					send({
-						type: 'itemNew',
+						type: 'ITEM_NEW',
 						exitTo: 'details', // click 'cancel' will go back to detail screen
 					})
 				}
@@ -218,25 +216,27 @@ const Listing = props => {
 
 	const handleDelete = itm => {
 		const target = itm ? itm : getItemById(items, selectedItemId)
-		const modalData = {
-			type: 'MODAL_DELETE',
-			title: 'Item Removal Confirmation',
-			content: `Are you sure to delete ${target.label}?`,
-			data: target,
-			exitModalTo: 'master',
-		}
+
 		//
 		send({
-			type: 'itemDelete',
-			modalData,
+			type: 'ITEM_DELETE',
+			target,
 		})
 	}
 
 	const handleViewDetails = itm => {
 		send({
-			type: 'itemDetails',
+			type: 'ITEM_DETAILS',
 			item: itm,
 			exitTo: 'master',
+		})
+	}
+
+	const handleItemSelect = itm => {
+		send({
+			type: 'ITEM_SELECT',
+			item: itm,
+			from: 'master'
 		})
 	}
 
@@ -244,20 +244,12 @@ const Listing = props => {
 		<div key={itm.id}>
 			<span
 				style={itm.id === selectedItemId ? { backgroundColor: 'pink' } : null}
-				onClick={e => {
-					send({
-						type: 'itemSelect',
-						item: itm,
-					})
-				}}
+				onClick={evt => handleItemSelect(itm)}
 				onDoubleClick={() => handleViewDetails(itm)}
 			>
 				{itm.id} - {itm.label}
 			</span>
 			{<button onClick={() => handleViewDetails(itm)}>🔎</button>}
-			{/*
-			{<button onClick={() => handleDelete(itm)}>❌</button>}
-			*/}
 		</div>
 	))
 
@@ -417,18 +409,11 @@ export const Wrap = () => {
 	const once = useRef(false)
 	const service = useRef()
 
-	const notify = msg => toaster.notify(msg, {
-		position: 'bottom-right',
-	})
-
 	// this is the constructur, make sure it only runs once
 	if(once.current === false){
 		once.current = true
 
-		service.current = interpret(machine.withContext({
-			...machine.context,
-			notify, // passing side effect command to fsm
-		}))
+		service.current = interpret(machine)
 		.onTransition( state => {
 			// init event
 			if(state.changed === undefined) return

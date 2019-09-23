@@ -7,7 +7,8 @@ export const fsm = {
 		modalData: null,
 	},
 
-	initial: 'main',
+	type: 'parallel',
+
 	states: {
 		main: {
 
@@ -31,14 +32,12 @@ export const fsm = {
 				ITEM_NEW: [
 					{
 						actions: [],
-						cond: undefined,
 						target: ['#Root.main.newItem'],
 					},
 				],
 				ITEM_EDIT: [
 					{
 						actions: [],
-						cond: undefined,
 						target: ['#Root.main.editItem'],
 					},
 				],
@@ -53,19 +52,41 @@ export const fsm = {
 			states: {
 
 				//
-				loadFailed: {
+				loading: {
+					entry: [
+						{
+							type: 'reloadItems',
+						},
+					],
 					on: {
-						MODAL_CLOSE: [
+						ITEM_LOAD_FAIL: [
 							{
-								actions: [],
-								cond: undefined,
+								actions: ['listDataError'],
+								target: ['#Root.main.loadFailed'],
+							},
+						],
+						ITEM_LOAD_SUCCESS: [
+							{
+								actions: ['listDataSuccess'],
 								target: ['#Root.main.master'],
 							},
 						],
-						MODAL_RETRY: [
+					},
+					states: {},
+				},
+
+				//
+				loadFailed: {
+					on: {
+						MODAL_ERROR_CLOSE: [
 							{
-								actions: [],
-								cond: undefined,
+								target: ['#Root.main.master'],
+								actions: ['modalReset'],
+							},
+						],
+						MODAL_ERROR_RETRY: [
+							{
+								actions: ['modalReset'],
 								target: ['#Root.main.loading'],
 							},
 						],
@@ -79,18 +100,22 @@ export const fsm = {
 					on: {
 						ITEM_RELOAD: [
 							{
-								actions: [],
-								cond: undefined,
 								target: ['#Root.main.loading'],
+								actions: [],
 							},
 						],
 						ITEM_DETAILS: [
 							{
-								actions: [],
-								cond: undefined,
 								target: ['#Root.main.master'],
+								actions: [],
 							},
 						],
+						// ITEM_SELECT: [
+						// 	{
+						// 		target: ['#Root.main.master'],
+						// 		actions: ['selectItem'],
+						// 	},
+						// ],
 					},
 					states: {},
 					order: 2,
@@ -102,7 +127,6 @@ export const fsm = {
 						ITEM_BACK: [
 							{
 								actions: [],
-								cond: undefined,
 								target: ['#Root.main.master'],
 							},
 						],
@@ -119,10 +143,8 @@ export const fsm = {
 								actions: [
 									{
 										type: 'updateItem',
-										exec: undefined,
 									},
 								],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -131,10 +153,8 @@ export const fsm = {
 								actions: [
 									{
 										type: 'restoreItem',
-										exec: undefined,
 									},
 								],
-								cond: undefined,
 								target: ['#Root.main.master'],
 							},
 						],
@@ -143,10 +163,8 @@ export const fsm = {
 								actions: [
 									{
 										type: 'updateItem',
-										exec: undefined,
 									},
 								],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -155,17 +173,14 @@ export const fsm = {
 								actions: [
 									{
 										type: 'restoreItem',
-										exec: undefined,
 									},
 								],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
 						DELETE_ITEM_SUCCESS: [
 							{
 								actions: [],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -174,10 +189,8 @@ export const fsm = {
 								actions: [
 									{
 										type: 'restoreItem',
-										exec: undefined,
 									},
 								],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -210,7 +223,6 @@ export const fsm = {
 						NEW_ITEM_SUBMIT: [
 							{
 								actions: [],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -243,7 +255,6 @@ export const fsm = {
 						EDIT_ITEM_SUBMIT: [
 							{
 								actions: [],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
 							},
 						],
@@ -255,29 +266,28 @@ export const fsm = {
 				//
 				deleteItem: {
 					on: {
-						modalConfirm: [
+						MODAL_ITEM_DELETE_CONFIRM: [
 							{
-								actions: [],
-								cond: undefined,
 								target: ['#Root.main.optimisticPending'],
+								actions: ['modalReset'],
 							},
 						],
-						modalCancel: [
+						MODAL_ITEM_DELETE_CANCEL: [
 							{
-								actions: [],
 								cond: {
 									name: 'backToMaster',
 									predicate: undefined,
 								},
 								target: ['#Root.main.master'],
+								actions: ['modalReset'],
 							},
 							{
 								target: ['#Root.main.details'],
-								actions: [],
 								cond: {
 									name: 'backToDetails',
 									predicate: undefined,
 								},
+								actions: ['modalReset'],
 							},
 						],
 					},
@@ -285,34 +295,29 @@ export const fsm = {
 					order: 7,
 				},
 
-				//
-				loading: {
-					on: {
-						ITEM_LOAD_FAIL: [
-							{
-								actions: [],
-								target: ['#Root.main.loadFailed'],
-							},
-						],
-						ITEM_LOAD_SUCCESS: [
-							{
-								actions: ['listDataSuccess'],
-								target: ['#Root.main.master'],
-							},
-						],
-					},
-					states: {},
-					order: 1,
-					entry: [
-						{
-							type: 'reloadItems',
-							exec: undefined,
-						},
-					],
-				},
 			},
 			order: 2,
 			initial: 'loading',
+		},
+
+		global: {
+			initial: 'selection',
+			states: {
+				selection: {
+					initial: 'unSelected',
+					states: {
+						selected: {},
+						unSelected: {},
+					},
+					on: {
+						ITEM_SELECT: {
+							target: '.selected',
+							actions: 'selectItem',
+						},
+					},
+				},
+
+			},
 		},
 	},
 	on: {},
