@@ -4,19 +4,11 @@ import React, { useEffect, useState, useRef, useContext, memo } from 'react'
 import { useMachine, useService } from '@xstate/react'
 import { interpret } from 'xstate'
 import { machine, } from '../fsm/machine'
-import { randomId, dumpState, stateValuesEqual, getItemById } from '../utils/helpers'
+import { randomId, dumpState, stateValuesEqual } from '../utils/helpers'
 
 import styled, { createGlobalStyle } from 'styled-components'
 
 import '../components/styles.css'
-
-import toaster from 'toasted-notes'
-import 'toasted-notes/src/styles.css'
-
-// helper: toaster as a side effect
-const notify = msg => toaster.notify(msg, {
-	position: 'bottom-right',
-})
 
 // import whyDidYouRender from '@welldone-software/why-did-you-render'
 // whyDidYouRender(React)
@@ -36,7 +28,8 @@ const StyledModal = styled.div`
 //
 const ModalError = props => {
 	const { send } = useContext(MyContext)
-	const { title, content } = props.modalData
+	const { title, content } = props
+
 	return (
 		<StyledModal>
 			<div>Title: {title}</div>
@@ -55,9 +48,9 @@ const ModalError = props => {
 
 //
 const ModalDelete = props => {
-
 	const { send } = useContext(MyContext)
-	const { title, content, data } = props.modalData
+	const { title, content, data } = props
+
 	return (
 		<StyledModal>
 			<div>Title: {title}</div>
@@ -93,25 +86,19 @@ const ItemNew = props => {
 	const [content, setContent] = useState('')
 
 	const handleSubmit = () => {
-
-		if(content === '') {
-			notify('Input can not be empty')
-			return
-		}
-
 		const newItem = {
 			id: `tmp_${randomId()}`,
 			label: `Label_${content}`,
 		}
 
 		send({
-			type: 'NEW_ITEM_SUBMIT',
+			type: 'newItemSubmit',
 			payload: newItem,
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'NEW_ITEM_CANCEL' })
+		send({ type: 'newItemCancel' })
 	}
 
 	const handleChange = e => {
@@ -138,18 +125,18 @@ const ItemNew = props => {
 const ItemEdit = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
-	const oldItem = getItemById(items, selectedItemId)
-	const [content, setContent] = useState(oldItem.label)
+	const { id, label } = getItemById(items, selectedItemId)
+	const [content, setContent] = useState(label)
+
 	const handleSubmit = () => {
 		send({
-			type: 'ITEM_EDIT_SUBMIT',
-			payload: { id: oldItem.id, label: content },
-			oldItem,
+			type: 'editSubmit',
+			payload: { id, label: content },
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'ITEM_EDIT_CANCEL' })
+		send({ type: 'editCancel' })
 	}
 
 	const handleChange = e => {
@@ -184,27 +171,19 @@ const Details = props => {
 	const { id, label } = selectedItem
 
 	const handleDelete = () => {
-		send({
-			type: 'ITEM_DELETE',
-			from: 'details',
-		})
-	}
+		// prepare modal data to be displayed
+		const modalData = {
+			type: 'MODAL_DELETE',
+			title: 'Item Removal Confirmation',
+			content: `Are you sure to delete ${selectedItem.label}?`,
+			data: selectedItem,
+			exitModalTo: 'details',
+		}
 
-	const handleEdit = () => {
+		// then dispatch the modal data
 		send({
-			type: 'ITEM_EDIT',
-			from:'details'
-		})
-	}
-
-	const handleBack = () => {
-		send({ type: 'ITEM_BACK' })
-	}
-
-	const handleCreate = () => {
-		send({
-			type: 'ITEM_NEW',
-			from: 'details', // click 'cancel' will go back to detail screen
+			type: 'itemDelete',
+			modalData,
 		})
 	}
 
@@ -213,9 +192,18 @@ const Details = props => {
 			Item Details
 			<h2>ID: {id}</h2>
 			<h2>Content: {label}</h2>
-			<button onClick={handleCreate}>New</button>
-			<button onClick={handleEdit}>Edit</button>
-			<button onClick={handleBack}>Back</button>
+			<button
+				onClick={() =>
+					send({
+						type: 'ITEM_NEW',
+						exitTo: 'details', // click 'cancel' will go back to detail screen
+					})
+				}
+			>
+				New
+			</button>
+			<button onClick={() => send({ type: 'itemEdit', exitTo:'details' })}>Edit</button>
+			<button onClick={() => send({ type: 'itemBack' })}>Back</button>
 			<button onClick={handleDelete}>Delete</button>
 		</div>
 	)
@@ -226,10 +214,13 @@ const Listing = props => {
 	const { state, send } = useContext(MyContext)
 	const { items, selectedItemId } = state.context
 
-	const handleDelete = () => {
+	const handleDelete = itm => {
+		const target = itm ? itm : getItemById(items, selectedItemId)
+
+		//
 		send({
 			type: 'ITEM_DELETE',
-			from: 'master'
+			target,
 		})
 	}
 
@@ -267,20 +258,6 @@ const Listing = props => {
 
 	const btnEnabled = state.matches('global.selection.selected')
 
-	const handleCreateItem = itm => {
-		send({
-			type: 'ITEM_NEW',
-			from: 'master', // click 'cancel' will go back to listing screen
-		})
-	}
-
-	const handleEditItem = itm => {
-		send({
-			type: 'ITEM_EDIT',
-			from: 'master'
-		})
-	}
-
 	return (
 		<div>
 
@@ -290,14 +267,19 @@ const Listing = props => {
 
 			<button
 				id='btnAdd'
-				onClick={handleCreateItem}
+				onClick={() =>
+					send({
+						type: 'itemNew',
+						exitTo: 'master', // click 'cancel' will go back to listing screen
+					})
+				}
 			>
 				New
 			</button>
 
 			<button
 				id='btnEdit'
-				onClick={handleEditItem}
+				onClick={() => send({ type: 'itemEdit', exitTo: 'master' })}
 				disabled={!btnEnabled}
 			>
 				Edit
@@ -305,19 +287,43 @@ const Listing = props => {
 
 			<button
 				id='btnRemove'
-				onClick={handleDelete}
+				onClick={() => handleDelete(null)}
 				disabled={!btnEnabled}
 			>
-				Delete
+				Remove
 			</button>
 
 			<button
 				id='btnReload'
-				onClick={() => send({ type: 'ITEM_RELOAD' })}
+				onClick={() => send({ type: 'itemReload' })}
 			>
 				Reload
 			</button>
 
+			{/*<button
+				id='btnTest'
+				onClick={() => {
+
+					// this is to show request could be cancelled any time, using one of following two approaches
+
+					// might as well use DOM api
+					// if(signal.current)
+					// 	signal.current.abort()
+					// const controller = new AbortController()
+					// signal.current = controller
+					// send({ type: test, signal: signal.current.signal })
+
+					// cancel previous request first
+					if(signal.current)
+						signal.current.cancel = true
+
+					// then send next request
+					signal.current = { cancel: false }
+					send({ type: 'test', signal: signal.current })
+				}}
+			>
+				Test
+			</button>*/}
 		</div>
 	)
 }
@@ -335,10 +341,10 @@ const getModal = () => {
 
 	switch (modalData.type) {
 		case 'MODAL_DELETE':
-			modal = <ModalDelete modalData={modalData} />
+			modal = <ModalDelete {...modalData} />
 			break
 		case 'MODAL_ERROR':
-			modal = <ModalError modalData={modalData} />
+			modal = <ModalError {...modalData} />
 			break
 		default:
 			modal = null
@@ -347,18 +353,25 @@ const getModal = () => {
 	return modal
 }
 
+// helper
+const getItemById = (items, id) => items.find(it => it.id === id)
 
 // main app
 const App = props => {
 	const { state, send } = useContext(MyContext)
 
-	console.log( '\n[App run]',  )
+	console.log( '\nApp',  )
+
+	// console.log('\n[State] = ', state.value, '\n[context] = ', state.context)
+	// console.log('\n[context] = ', state.context)
+
+	const { notifications } = state.context
 
 	const listing = !state.matches('main.master') ? null : <Listing />
 
-	const itemEdit = !state.matches('main.editItem') ? null : <ItemEdit />
+	const itemEdit = !state.matches('main.edit') ? null : <ItemEdit />
 
-	const itemNew = !state.matches('main.newItem') ? null : <ItemNew />
+	const itemNew = !state.matches('main.new') ? null : <ItemNew />
 
 	const details = !state.matches('main.details') ? null : <Details />
 
@@ -382,7 +395,7 @@ const App = props => {
 	)
 }
 
-// Entry point
+
 export const Wrap = () => {
 
 	// console.log( '\nWrap run'  )

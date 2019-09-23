@@ -39,12 +39,12 @@ export const fsm = {
 				ITEM_DELETE: [
 					{
 						target: ['#Root.main.master'],
-						cond: (_, e) => e.from === 'master',
+						cond: 'cancelToMaster',
 						actions: ['deleteItem'],
 					},
 					{
 						target: ['#Root.main.details'],
-						cond: (_, e) => e.from === 'details',
+						cond: 'cancelToMaster',
 						actions: ['deleteItem'],
 					},
 				],
@@ -91,7 +91,6 @@ export const fsm = {
 					},
 				],
 
-// xxxx -> 
 				// +TBD: 這段目前被迫在 master|details 各貼一次，無法移上來到 main 這層放一次磺好
 				// 主要是 confirm 要對 ItemService 送事件時失敗
 				// 錯誤為：Unable to send event to child 'ItemService' from service 'Root'.
@@ -127,14 +126,14 @@ export const fsm = {
 					on: {
 						LOAD_ITEM_FAIL: [
 							{
-								actions: ['listDataError'],
 								target: ['#Root.main.loadFailed'],
+								actions: ['listDataError'],
 							},
 						],
 						LOAD_ITEM_SUCCESS: [
 							{
-								actions: ['listDataSuccess'],
 								target: ['#Root.main.master'],
+								actions: ['listDataSuccess'],
 							},
 						],
 					},
@@ -152,8 +151,8 @@ export const fsm = {
 						],
 						MODAL_ERROR_RETRY: [
 							{
-								actions: ['modalReset'],
 								target: ['#Root.main.loading'],
+								actions: ['modalReset'],
 							},
 						],
 					},
