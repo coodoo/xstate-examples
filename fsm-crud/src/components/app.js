@@ -184,10 +184,27 @@ const Details = props => {
 	const { id, label } = selectedItem
 
 	const handleDelete = () => {
-		// then dispatch the modal data
 		send({
-			type: 'itemDelete',
+			type: 'ITEM_DELETE',
 			from: 'details',
+		})
+	}
+
+	const handleEdit = () => {
+		send({
+			type: 'ITEM_EDIT',
+			from:'details'
+		})
+	}
+
+	const handleBack = () => {
+		send({ type: 'ITEM_BACK' })
+	}
+
+	const handleCreate = () => {
+		send({
+			type: 'ITEM_NEW',
+			from: 'details', // click 'cancel' will go back to detail screen
 		})
 	}
 
@@ -196,18 +213,9 @@ const Details = props => {
 			Item Details
 			<h2>ID: {id}</h2>
 			<h2>Content: {label}</h2>
-			<button
-				onClick={() =>
-					send({
-						type: 'ITEM_NEW',
-						exitTo: 'details', // click 'cancel' will go back to detail screen
-					})
-				}
-			>
-				New
-			</button>
-			<button onClick={() => send({ type: 'itemEdit', exitTo:'details' })}>Edit</button>
-			<button onClick={() => send({ type: 'itemBack' })}>Back</button>
+			<button onClick={handleCreate}>New</button>
+			<button onClick={handleEdit}>Edit</button>
+			<button onClick={handleBack}>Back</button>
 			<button onClick={handleDelete}>Delete</button>
 		</div>
 	)
@@ -273,7 +281,6 @@ const Listing = props => {
 		})
 	}
 
-
 	return (
 		<div>
 
@@ -301,7 +308,7 @@ const Listing = props => {
 				onClick={handleDelete}
 				disabled={!btnEnabled}
 			>
-				Remove
+				Delete
 			</button>
 
 			<button

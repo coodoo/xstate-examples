@@ -33,8 +33,8 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 					// for test only
 					// randomly trigger happy and sorrow path to test both scenarios
-					if((t % 2) == 0 ){
-					// if(true){
+					// if((t % 2) == 0 ){
+					if(true){
 					// if(false){
 						// if fetching succeeded
 						cb({

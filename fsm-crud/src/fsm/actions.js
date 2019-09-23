@@ -33,6 +33,18 @@ export const listDataError = assign((ctx, e) => {
 /* delete item
 -------------------------------------------------- */
 
+export const deleteItem = assign((ctx, e) => {
+	const { from } = e
+	const selectedItem = getItemById(ctx.items, ctx.selectedItemId)
+	ctx.modalData = {
+		type: 'MODAL_DELETE',
+		title: 'Item Removal Confirmation',
+		content: `Are you sure to delete ${selectedItem.label}?`,
+		data: selectedItem,
+	}
+	ctx.opFrom = e.from
+})
+
 // optimistic update
 export const localDeleteItem = assign((ctx, e) => {
 	const selectedItemId = e.data.id
@@ -179,47 +191,3 @@ export const selectItem = assign((ctx, e) => {
 export const modalReset = assign((ctx, e) => {
 	ctx.modalData = null
 })
-
-
-/* +TBD
--------------------------------------------------- */
-
-export const clearNotification = assign((ctx, e) => {
-	ctx.notifications = ctx.notifications.filter(it => !e.popped.includes(it))
-})
-
-export const testAction = send(
-	(ctx, e) => ({
-		type: 'test',
-		signal: e.signal,
-	}),
-	{ to: 'CancelService' },
-)
-
-export const testResultAction = assign((ctx, e) => {
-	console.log('[subMachine result]', e)
-})
-
-export const testMe = assign((ctx, e) => {
-	console.log('[subMachine]', e)
-})
-
-// update ctx.modalData
-export const deleteItem = assign((ctx, e) => {
-	const { from } = e
-	const { items, selectedItemId } = ctx
-	const target = getItemById( items, selectedItemId )
-
-	//
-	const modalData = {
-		type: 'MODAL_DELETE',
-		title: 'Item Removal Confirmation',
-		content: `Are you sure to delete ${target.label}?`,
-		data: target,
-	}
-
-	// remark the op was triggered by master screen, so we when later cancelled we know where to go back to
-	ctx.opFrom = from
-	ctx.modalData = modalData
-})
-

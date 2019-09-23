@@ -38,7 +38,13 @@ export const fsm = {
 				],
 				ITEM_DELETE: [
 					{
-						target: ['#Root.main.deleteItem'],
+						target: ['#Root.main.master'],
+						cond: (_, e) => e.from === 'master',
+						actions: ['deleteItem'],
+					},
+					{
+						target: ['#Root.main.details'],
+						cond: (_, e) => e.from === 'details',
 						actions: ['deleteItem'],
 					},
 				],
@@ -85,6 +91,28 @@ export const fsm = {
 					},
 				],
 
+// xxxx -> 
+				// +TBD: 這段目前被迫在 master|details 各貼一次，無法移上來到 main 這層放一次磺好
+				// 主要是 confirm 要對 ItemService 送事件時失敗
+				// 錯誤為：Unable to send event to child 'ItemService' from service 'Root'.
+				MODAL_ITEM_DELETE_CONFIRM: [
+					{
+						target: ['#Root.main.master'],
+						actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+					},
+				],
+				MODAL_ITEM_DELETE_CANCEL: [
+					{
+						target: ['#Root.main.master'],
+						cond: 'backToMaster',
+						actions: ['modalReset'],
+					},
+					{
+						target: ['#Root.main.details'],
+						cond: 'backToDetails',
+						actions: ['modalReset'],
+					},
+				],
 			},
 
 			states: {
@@ -130,7 +158,6 @@ export const fsm = {
 						],
 					},
 					states: {},
-					order: 0,
 				},
 
 				//
@@ -144,13 +171,32 @@ export const fsm = {
 						],
 						ITEM_DETAILS: [
 							{
-								target: ['#Root.main.master'],
+								target: ['#Root.main.details'],
 								actions: [],
 							},
 						],
+
+						// MODAL_ITEM_DELETE_CONFIRM: [
+						// 	{
+						// 		target: ['#Root.main.master'],
+						// 		actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+						// 	},
+						// ],
+						// MODAL_ITEM_DELETE_CANCEL: [
+						// 	{
+						// 		target: ['#Root.main.master'],
+						// 		cond: 'backToMaster',
+						// 		actions: ['modalReset'],
+						// 	},
+						// 	{
+						// 		target: ['#Root.main.details'],
+						// 		cond: 'backToDetails',
+						// 		actions: ['modalReset'],
+						// 	},
+						// ],
+
+
 					},
-					states: {},
-					order: 2,
 				},
 
 				//
@@ -162,9 +208,25 @@ export const fsm = {
 								target: ['#Root.main.master'],
 							},
 						],
+						// MODAL_ITEM_DELETE_CONFIRM: [
+						// 	{
+						// 		target: ['#Root.main.master'],
+						// 		actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+						// 	},
+						// ],
+						// MODAL_ITEM_DELETE_CANCEL: [
+						// 	{
+						// 		target: ['#Root.main.master'],
+						// 		cond: 'backToMaster',
+						// 		actions: ['modalReset'],
+						// 	},
+						// 	{
+						// 		target: ['#Root.main.details'],
+						// 		cond: 'backToDetails',
+						// 		actions: ['modalReset'],
+						// 	},
+						// ],
 					},
-					states: {},
-					order: 3,
 				},
 
 				//
@@ -214,31 +276,6 @@ export const fsm = {
 						],
 					},
 				},
-
-				// show confirmation modal
-				deleteItem: {
-					on: {
-						MODAL_ITEM_DELETE_CONFIRM: [
-							{
-								target: ['#Root.main.master'],
-								actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
-							},
-						],
-						MODAL_ITEM_DELETE_CANCEL: [
-							{
-								target: ['#Root.main.master'],
-								cond: 'backToMaster',
-								actions: ['modalReset'],
-							},
-							{
-								target: ['#Root.main.details'],
-								cond: 'backToDetails',
-								actions: ['modalReset'],
-							},
-						],
-					},
-				},
-
 			},
 			initial: 'loading',
 		},
