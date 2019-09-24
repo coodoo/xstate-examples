@@ -12,15 +12,6 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 	onReceive(evt => {
 		switch (evt.type) {
 
-			// +TBD
-			case 'foo':
-				console.log( 'SERVICE > foo 跑了',  )
-				cb({
-					type: 'bbb'
-				})
-
-				break
-
 			//
 			case 'SERVICE.LOAD.ITEMS':
 				const fakeItem = () => {

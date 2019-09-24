@@ -1,6 +1,3 @@
-import { send, assign } from 'xstate'
-import { getItemById } from '../utils/helpers'
-
 export const fsm = {
 	id: 'Root',
 
@@ -41,81 +38,14 @@ export const fsm = {
 				],
 				ITEM_DELETE: [
 					{
-						target: ['#Root.main.master'],
+						target: ['#Root.main.master', '#Root.global.modal.confirmation'],
 						cond: 'cancelToMaster',
 						actions: ['deleteItem'],
 					},
 					{
-						target: ['#Root.main.details'],
+						target: ['#Root.main.details', '#Root.global.modal.confirmation'],
 						cond: 'cancelToDetails',
 						actions: ['deleteItem'],
-					},
-				],
-
-
-
-				// optimistic result - delete item
-				OPTIMISTIC_DELETE_ITEM_SUCCESS: [
-					{
-						target: ['#Root.main.master', '#Root.global.selection.unSelected'],
-						actions: 'deleteOptimisticItemSuccess',
-					},
-				],
-				OPTIMISTIC_DELETE_ITEM_FAIL: [
-					{
-						target: ['#Root.main.master', '#Root.global.selection.selected'],
-						actions: 'restoreOptimisticDeleteItem',
-					},
-				],
-
-				// optimistic result - create item
-				OPTIMISTIC_CREATE_ITEM_SUCCESS: [
-					{
-						target: ['#Root.main.master'],
-						actions: 'createOptimisticItemSuccess',
-					},
-				],
-				OPTIMISTIC_CREATE_ITEM_FAIL: [
-					{
-						target: ['#Root.main.master'],
-						actions: 'restoreOptimisticNewItem',
-					},
-				],
-
-				// optimistic result - edit item
-				OPTIMISTIC_EDIT_ITEM_SUCCESS: [
-					{
-						target: ['#Root.main.master'],
-						actions: 'editOptimisticItemSuccess',
-					},
-				],
-				OPTIMISTIC_EDIT_ITEM_FAIL: [
-					{
-						target: ['#Root.main.master'],
-						actions: 'restoreOptimisticEditItem',
-					},
-				],
-
-				// +TBD: 這段目前被迫在 master|details 各貼一次，無法移上來到 main 這層放一次磺好
-				// 主要是 confirm 要對 ItemService 送事件時失敗
-				// 錯誤為：Unable to send event to child 'ItemService' from service 'Root'.
-				MODAL_ITEM_DELETE_CONFIRM: [
-					{
-						target: ['#Root.main.master'],
-						// actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
-						actions: ['remoteDeleteItem'],
-					},
-				],
-				MODAL_ITEM_DELETE_CANCEL: [
-					{
-						target: ['#Root.main.master'],
-						cond: 'backToMaster',
-						actions: ['modalReset'],
-					},
-					{
-						target: ['#Root.main.details'],
-						cond: 'backToDetails',
-						actions: ['modalReset'],
 					},
 				],
 			},
@@ -130,7 +60,7 @@ export const fsm = {
 					on: {
 						LOAD_ITEM_FAIL: [
 							{
-								target: ['#Root.main.loadFailed'],
+								target: [ '#Root.main.master', '#Root.global.modal.error'],
 								actions: ['listDataError'],
 							},
 						],
@@ -138,25 +68,6 @@ export const fsm = {
 							{
 								target: ['#Root.main.master'],
 								actions: ['listDataSuccess'],
-							},
-						],
-					},
-					states: {},
-				},
-
-				//
-				loadFailed: {
-					on: {
-						MODAL_ERROR_CLOSE: [
-							{
-								target: ['#Root.main.master'],
-								actions: ['modalReset'],
-							},
-						],
-						MODAL_ERROR_RETRY: [
-							{
-								target: ['#Root.main.loading'],
-								actions: ['modalReset'],
 							},
 						],
 					},
@@ -248,6 +159,106 @@ export const fsm = {
 			type: 'parallel',
 
 			states: {
+
+				// 目前看來沒有 state，只需 event
+				optimisticPending: {
+					on: {
+						// optimistic result - delete item
+						OPTIMISTIC_DELETE_ITEM_SUCCESS: [
+							{
+								target: ['#Root.main.master', '#Root.global.selection.unSelected'],
+								actions: 'deleteOptimisticItemSuccess',
+							},
+						],
+						OPTIMISTIC_DELETE_ITEM_FAIL: [
+							{
+								target: ['#Root.main.master', '#Root.global.selection.selected'],
+								actions: 'restoreOptimisticDeleteItem',
+							},
+						],
+
+						// optimistic result - create item
+						OPTIMISTIC_CREATE_ITEM_SUCCESS: [
+							{
+								target: ['#Root.main.master'],
+								actions: 'createOptimisticItemSuccess',
+							},
+						],
+						OPTIMISTIC_CREATE_ITEM_FAIL: [
+							{
+								target: ['#Root.main.master'],
+								actions: 'restoreOptimisticNewItem',
+							},
+						],
+
+						// optimistic result - edit item
+						OPTIMISTIC_EDIT_ITEM_SUCCESS: [
+							{
+								target: ['#Root.main.master'],
+								actions: 'editOptimisticItemSuccess',
+							},
+						],
+						OPTIMISTIC_EDIT_ITEM_FAIL: [
+							{
+								target: ['#Root.main.master'],
+								actions: 'restoreOptimisticEditItem',
+							},
+						],
+					}
+				},
+
+				// error or confirmation
+				modal: {
+					initial: 'idle',
+					//
+					states: {
+						idle: {},
+
+						// ok
+						error: {
+							on: {
+								MODAL_ERROR_CLOSE: [
+									{
+										target: ['#Root.main.master', '#Root.global.modal.idle'],
+										actions: ['modalReset'],
+									},
+								],
+								MODAL_ERROR_RETRY: [
+									{
+										target: ['#Root.main.loading', '#Root.global.modal.idle'],
+										actions: ['modalReset'],
+									},
+								],
+							},
+						},
+
+						//
+						confirmation: {
+							on: {
+								MODAL_ITEM_DELETE_CONFIRM: [
+									{
+										target: ['#Root.main.master', '#Root.global.selection.unSelected', '#Root.global.modal.idle'],
+										actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+									},
+								],
+								MODAL_ITEM_DELETE_CANCEL: [
+									{
+										target: ['#Root.main.master', '#Root.global.modal.idle'],
+										cond: 'backToMaster',
+										actions: ['modalReset'],
+									},
+									{
+										target: ['#Root.main.details', '#Root.global.modal.idle'],
+										cond: 'backToDetails',
+										actions: ['modalReset'],
+									},
+								],
+							}
+
+						},
+					}
+				},
+
 				//
 				selection: {
 					initial: 'unSelected',

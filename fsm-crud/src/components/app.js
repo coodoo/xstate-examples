@@ -300,15 +300,15 @@ const getModal = () => {
 	const { modalData } = state.context
 
 	// early bailout
-	if (!modalData) return null
+	if (state.matches('global.modal.idle')) return null
 
 	let modal = null
 
-	switch (modalData.type) {
-		case 'MODAL_DELETE':
+	switch (true) {
+		case state.matches('global.modal.confirmation'):
 			modal = <ModalDelete {...modalData} />
 			break
-		case 'MODAL_ERROR':
+		case state.matches('global.modal.error'):
 			modal = <ModalError {...modalData} />
 			break
 		default:

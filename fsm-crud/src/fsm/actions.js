@@ -9,13 +9,6 @@ const notify = msg => toaster.notify(msg, {
 	position: 'bottom-right',
 })
 
-// +TBD
-export const foo = send(
-	{ type: 'foo' },
-	{ to: 'ItemService' }
-)
-
-
 /* read item
 -------------------------------------------------- */
 
@@ -30,7 +23,6 @@ export const listDataSuccess = assign((ctx, evt) => {
 
 export const listDataError = assign((ctx, e) => {
 	ctx.modalData = {
-		type: 'MODAL_ERROR',
 		title: 'Fetching list data failed.',
 		content: `Details: ${e.data}`,
 		data: e.data,
@@ -44,7 +36,6 @@ export const deleteItem = assign((ctx, e) => {
 	const { from } = e
 	const selectedItem = getItemById(ctx.items, ctx.selectedItemId)
 	ctx.modalData = {
-		type: 'MODAL_DELETE',
 		title: 'Item Removal Confirmation',
 		content: `Are you sure to delete ${selectedItem.label}?`,
 		data: selectedItem,
