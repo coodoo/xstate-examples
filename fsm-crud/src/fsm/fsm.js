@@ -164,20 +164,6 @@ export const fsm = {
 				// 目前看來沒有 state，只需 event
 				optimisticPending: {
 					on: {
-						// optimistic result - delete item
-						OPTIMISTIC_DELETE_ITEM_SUCCESS: [
-							{
-								target: ['#Root.main.master', '#Root.global.selection.unSelected'],
-								actions: 'deleteOptimisticItemSuccess',
-							},
-						],
-						OPTIMISTIC_DELETE_ITEM_FAIL: [
-							{
-								target: ['#Root.main.master', '#Root.global.selection.selected'],
-								actions: 'restoreOptimisticDeleteItem',
-							},
-						],
-
 						// optimistic result - create item
 						OPTIMISTIC_CREATE_ITEM_SUCCESS: [
 							{
@@ -257,9 +243,9 @@ export const fsm = {
 							},
 						},
 
+						// need a new state to invoke deleteItem Promise
 						deletionInFligh: {
 							invoke: {
-								id: 'ddd',
 								src: 'deleteItem',
 								onDone: [
 									{
