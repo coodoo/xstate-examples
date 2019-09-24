@@ -198,3 +198,37 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 		}
 	})
 }
+
+export const loadItems = () => {
+
+	const t = random(300, 1000)
+
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+
+			const fakeItem = () => {
+				const id = randomId()
+				const d = {
+					id,
+					label: `Label_${id}`,
+				}
+				return d
+			}
+
+			// instead of fetching data via API, we fake them here
+			const arr = [fakeItem(), fakeItem(), fakeItem()]
+
+			console.log( '\nfetched: ', arr )
+
+			// for test only
+			// randomly trigger happy and sorrow path to test both scenarios
+			// if((t % 2) == 0 ){
+			// if(true){
+			if(false){
+				resolve(arr)
+			} else {
+				reject('network error')
+			}
+		}, t)
+	})
+}

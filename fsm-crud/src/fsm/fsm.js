@@ -1,3 +1,4 @@
+import { send, assign, spawn } from 'xstate'
 export const fsm = {
 	id: 'Root',
 
@@ -57,7 +58,102 @@ export const fsm = {
 				//
 				loading: {
 					entry: 'reloadItems',
+
 					on: {
+
+						// Example 3 - spawnd Machine
+
+						'CHILD.INIT': {
+							actions: [
+
+								// 接下孩傳來的事件
+								assign((ctx, evt) => {
+									console.log( '\n下面傳來值: ', evt.msg, ctx )
+
+									// 對小孩廣播方法 1 - 操作 ref.send()
+									// ctx.ref.send({
+									// 	type: 'WAKE',
+									// 	msg: 'old: ' + evt.msg
+									// })
+								}),
+
+
+								// 對小孩廣播方法 2 - 用全域 send() 指令
+								send(
+									// 第一參數：要廣播給小孩的事件，同樣可拿到 ctx 等參數
+									(ctx, evt) => {
+										return {
+											type: 'WAKE', // 重要：故意傳錯誤事件，但小孩 machine 沒報錯
+											msg: 'old: ' + evt.msg,
+										}
+									},
+
+									// 第二參數：指定廣播對象 to
+									// {to: 'barbar'} // 寫死法
+									{ to: (ctx, evt) => ctx.ref } // 動態參數法可讀 ctx, evt
+								),
+
+							]
+						},
+
+						'REMOTE.READY': {
+							actions: (ctx, evt) => {
+								console.log( '小孩傳來: ', evt, ctx )
+							}
+						},
+
+
+						// Example 2 - spawnd Callback
+						/*
+						'COUNT.UPDATE': {
+							actions: [
+
+								// 接下孩傳來的事件
+								assign((ctx, evt) => {
+									console.log( '\n下面傳來值: ', evt.count )
+
+									// 對小孩廣播方法 1 - 直接包在 assign() 內話，就操作 ref.send()
+									// ctx.ref.send({
+									// 	type: 'INC',
+									// 	msg: 'old: ' + evt.count
+									// })
+								}),
+
+
+								// 對小孩廣播方法 2 - 如果不用 assign 而用全域 send() 包住的話
+								send(
+									// 第一參數：要廣播給小孩的事件，同樣可拿到 ctx 等參數
+									(ctx, evt) => {
+										return {
+											type: 'INC',
+											msg: 'old: ' + evt.count,
+										}
+									},
+
+									// 第二參數：指定廣播對象 to
+									// {to: 'barbar'} // 寫死法
+									{ to: (ctx, evt) => ctx.ref } // 動態參數法可讀 ctx, evt
+								),
+
+							]
+						},
+						*/
+
+						// Example 1 - spawned Promise
+						/*'done.invoke.foobar': {
+							target: 'master',
+							actions: (ctx, evt) => {
+								console.log( '撈到資料: ', evt.data )
+								debugger	//
+							}
+						},
+
+						'error.platform.foobar': {
+							actions: (ctx, evt, meta) => {
+								debugger	//
+							}
+						},*/
+
 						LOAD_ITEM_FAIL: [
 							{
 								target: [ '#Root.main.master', '#Root.global.modal.error'],

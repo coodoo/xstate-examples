@@ -393,7 +393,7 @@ export const Wrap = () => {
 			dumpState(state.value)
 			console.log( 'ctx=', state.context )
 			console.log( 'evt=', state.event )
-			console.log( '⬆️ - - - - - - - - - - -\n',  )
+			console.log( '⬆️⬆️ - - - - - - - - - - -\n',  )
 
 			// re-render if the state changed
 			forceUpdate(x => x+1)

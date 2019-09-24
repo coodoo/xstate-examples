@@ -1,6 +1,7 @@
 /* eslint-disable */
-import { send, assign } from 'xstate'
+import { send, assign, spawn, Machine, sendParent } from 'xstate'
 import { getItemById } from '../utils/helpers'
+import * as services from './services'
 import toaster from 'toasted-notes'
 import 'toasted-notes/src/styles.css'
 
@@ -12,10 +13,93 @@ const notify = msg => toaster.notify(msg, {
 /* read item
 -------------------------------------------------- */
 
-export const reloadItems = send(
-	{ type: 'SERVICE.LOAD.ITEMS' }, // the event to be sent
-	{ to: 'ItemService' }, // the target servcie to receive that event
-)
+// spawn Machine
+
+// 先建個 child machine
+// 它是獨立完整的個體，內部也可有 context{}
+const childMachine = Machine({
+  id: 'remote',
+  initial: 'offline', // 注意啟動時是在 offline 狀態，要等著被喚醒
+
+  // childMachine 開機後通知母體
+	entry: sendParent({
+			type: 'CHILD.INIT',
+			msg: 'from childMachine'
+	}),
+
+  states: {
+    offline: {
+      on: {
+        WAKE: {
+        	target: 'online',
+        	actions: (ctx, evt) => console.log( '\n\n收到上面值: ', evt )
+        }
+      }
+    },
+    online: {
+      after: {
+        1000: {
+        	target: 'running',
+          actions: sendParent(ctx => {
+          	return {type: 'REMOTE.READY'}
+          })
+        }
+      }
+    },
+    running: {}
+  }
+})
+
+export const reloadItems = assign((ctx, evt) => {
+	// spawn 出一個 Interpreter
+	ctx.ref = spawn(childMachine, 'SpawnedMachine')
+})
+
+
+// spawn Callback
+/*
+const counterInterval = (callback, receive) => {
+  let count = 0
+
+  const intervalId = setInterval(() => {
+    callback({ type: 'COUNT.UPDATE', count })
+  	if(count>=2) {
+  		clearInterval(intervalId)
+  		console.log( '\t結束',  )
+  	}
+  }, 1000);
+
+
+  receive(event => {
+    if (event.type === 'INC') {
+    	console.log( '\n上面傳來: ', event.msg  )
+      count++;
+    }
+  });
+
+  return () => { clearInterval(intervalId); }
+}
+
+export const reloadItems = assign((ctx, evt) => {
+	// spawn 出一個 {id: "barbar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
+	ctx.ref = spawn( counterInterval, 'barbar' )
+})
+*/
+
+// spawn Promise
+/*
+export const reloadItems = assign((ctx, evt) => {
+	// spawn 出 {id: "foobar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
+	ctx.ref = spawn(services.loadItems(), 'foobar')
+	debugger	//
+})
+*/
+
+// good old
+// export const reloadItems = send(
+// 	{ type: 'SERVICE.LOAD.ITEMS' }, // the event to be sent
+// 	{ to: 'ItemService' }, // the target servcie to receive that event
+// )
 
 export const listDataSuccess = assign((ctx, evt) => {
 	ctx.items = evt.data
