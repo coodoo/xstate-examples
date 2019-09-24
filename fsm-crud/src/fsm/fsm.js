@@ -56,22 +56,23 @@ export const fsm = {
 
 				//
 				loading: {
-					entry: 'reloadItems',
-					on: {
-						LOAD_ITEM_FAIL: [
+					// entry: 'reloadItems',
+					invoke: {
+						id: 'LoadSomeItems',
+						src: 'loadItems',
+						onError: [
 							{
 								target: [ '#Root.main.master', '#Root.global.modal.error'],
 								actions: ['listDataError'],
 							},
 						],
-						LOAD_ITEM_SUCCESS: [
+						onDone: [
 							{
 								target: ['#Root.main.master'],
 								actions: ['listDataSuccess'],
 							},
 						],
 					},
-					states: {},
 				},
 
 				//
@@ -237,8 +238,8 @@ export const fsm = {
 							on: {
 								MODAL_ITEM_DELETE_CONFIRM: [
 									{
-										target: ['#Root.main.master', '#Root.global.selection.unSelected', '#Root.global.modal.idle'],
-										actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+										target: ['#Root.main.master', '#Root.global.modal.deletionInFligh'],
+										actions: [],
 									},
 								],
 								MODAL_ITEM_DELETE_CANCEL: [
@@ -253,9 +254,31 @@ export const fsm = {
 										actions: ['modalReset'],
 									},
 								],
-							}
-
+							},
 						},
+
+						deletionInFligh: {
+							invoke: {
+								id: 'ddd',
+								src: 'deleteItem',
+								onDone: [
+									{
+										target: [
+											'#Root.main.master',
+											'#Root.global.selection.unSelected',
+											'#Root.global.modal.idle'],
+										actions: ['deleteOptimisticItemSuccess', 'modalReset'],
+									},
+								],
+								onError: [
+									{
+										target: [ '#Root.main.master', '#Root.global.modal.idle'],
+										actions: ['restoreOptimisticDeleteItem', 'modalReset'],
+									},
+								],
+							},
+						}
+
 					}
 				},
 

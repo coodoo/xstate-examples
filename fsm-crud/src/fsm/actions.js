@@ -43,23 +43,6 @@ export const deleteItem = assign((ctx, e) => {
 	ctx.opFrom = e.from
 })
 
-// optimistic update
-export const localDeleteItem = assign((ctx, e) => {
-	const selectedItemId = e.data.id
-	const newItems = ctx.items.filter(it => it.id !== selectedItemId)
-	ctx.items = newItems
-	ctx.selectedItemId = null
-	ctx.modalData = null
-})
-
-export const remoteDeleteItem = send(
-	// notify ItemService to delete item and dispatch once the job is completed
-	{ type: 'SERVICE.DELETE.ITEM' },
-	// designating who to receive this event
-	{ to: 'ItemService' },
-)
-
-
 //
 export const cancelItemDelete = assign((ctx, e) => {
 	ctx.modalData = null
@@ -67,7 +50,7 @@ export const cancelItemDelete = assign((ctx, e) => {
 
 // ok
 export const restoreOptimisticDeleteItem = assign((ctx, e) => {
-	const { info, payload } = e.error
+	const { info, payload } = e.data
 	const restoreItem = payload
 	ctx.items.push(restoreItem)
 	notify(info)
@@ -75,8 +58,8 @@ export const restoreOptimisticDeleteItem = assign((ctx, e) => {
 
 // ok
 export const deleteOptimisticItemSuccess = assign((ctx, e) => {
-	const { result } = e
-	notify(result.info)
+	const { info } = e.data
+	notify(info)
 })
 
 

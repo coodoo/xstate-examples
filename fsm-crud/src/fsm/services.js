@@ -199,65 +199,62 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 	})
 }
 
-// Callback service, which could dispatch event multiple times to it's parent
-/*export const cancelService = (ctx, e) => (cb, onReceive) => {
+export const loadItems = (ctx, e) => {
 
-	let cnt = 0
+	const t = random(300, 1000)
 
-	onReceive(evt => {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
 
-		switch( evt.type ){
+			const fakeItem = () => {
+				const id = randomId()
+				const d = {
+					id,
+					label: `Label_${id}`,
+				}
+				return d
+			}
 
-			case 'test':
+			// instead of fetching data via API, we fake them here
+			const arr = [fakeItem(), fakeItem(), fakeItem()]
 
-				const requestId = ++cnt
-				const signal = evt.signal
+			console.log( '\nfetched: ', arr )
 
-				console.log( '[Service test]', requestId, evt )
-
-				new Promise((resolve, reject) => {
-
-					setTimeout(() => {
-						resolve({
-							info: `Request ${requestId} completed`,
-						})
-						// reject({
-						// 	info: `Request ${requestId} failed`,
-						// })
-					}, 1000)
-				})
-
-				.then( result => {
-
-					// using DOM api
-					// if(signal.aborted === true){
-
-					if(signal.cancel===true){
-						console.log( '\n\n[Service cancelled]', requestId)
-					}else{
-						console.log( '\n\n[Service not cancelled]', requestId )
-						cb({
-							type: 'testResult',
-							result
-						})
-					}
-
-				})
-
-				.catch( error => {
-					return
-					cb({
-						type: 'testError',
-						error
-					})
-				})
-
-				break
-
-			default:
-				console.log( 'Unhandled method call=', evt.type  )
-		}
+			// for test only
+			// randomly trigger happy and sorrow path to test both scenarios
+			// if((t % 2) == 0 ){
+			if(true){
+			// if(false){
+				resolve(arr)
+			} else {
+				reject('network error')
+			}
+		}, t)
 	})
-
 }
-*/
+
+//
+export const deleteItem = (ctx, e) => {
+	const { selectedItemId } = ctx
+	const item = getItemById(ctx.items, selectedItemId)
+
+	// delete local item immediately
+	ctx.items = ctx.items.filter(it => it.id !== selectedItemId)
+	ctx.selectedItemId = null
+
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+
+			// happy path
+			// resolve({
+			// 	info: `${selectedItemId} deleted succesfully from the server`,
+			// })
+
+			// sorrow path
+			reject({
+				info: `Delete ${selectedItemId} from server failed, data restored.`,
+				payload: item,
+			})
+		}, 1200)
+	})
+}
