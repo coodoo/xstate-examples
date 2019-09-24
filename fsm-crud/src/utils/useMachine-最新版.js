@@ -121,6 +121,8 @@ export function useMachine<TContext, TEvent extends EventObject>(
 	service
 */
 export function useService<TContext, TEvent extends EventObject>(
+
+	// 注意收到的是 Interpreter，也就是 Machine 類型的 actor
   service: Interpreter<TContext, any, TEvent>
 ): [
   State<TContext, TEvent>,
@@ -128,6 +130,7 @@ export function useService<TContext, TEvent extends EventObject>(
   Interpreter<TContext, any, TEvent>
 ] {
 
+	// 將當前 interpreter 的 state 記錄下來
   const [current, setCurrent] = useState(service.state);
 
   useEffect(() => {
@@ -138,17 +141,23 @@ export function useService<TContext, TEvent extends EventObject>(
 
     const listener = state => {
       if (state.changed) {
+      	// 有變動就存入然後就觸發重繪
         setCurrent(state);
       }
     };
 
+    // 對傳入的 interpreter 偵聽變化
+    // 目地是每次變化後將新的 state 存入 useState hooks 並觸發重繪
     const sub = service.subscribe(listener);
 
     return () => {
       sub.unsubscribe();
     };
+
+  // 顯然是每次有餵入新的 interpreter 時才重跑
   }, [service]);
 
+  // 返還 [當前狀態, send 指令, service 就是 interpreter 本身 ]
   return [current, service.send, service];
 }
 
