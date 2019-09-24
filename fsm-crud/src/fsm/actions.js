@@ -9,6 +9,13 @@ const notify = msg => toaster.notify(msg, {
 	position: 'bottom-right',
 })
 
+// +TBD
+export const foo = send(
+	{ type: 'foo' },
+	{ to: 'ItemService' }
+)
+
+
 /* read item
 -------------------------------------------------- */
 
@@ -56,12 +63,8 @@ export const localDeleteItem = assign((ctx, e) => {
 
 export const remoteDeleteItem = send(
 	// notify ItemService to delete item and dispatch once the job is completed
-	(ctx, e) => {
-		return {
-			type: 'SERVICE.DELETE.ITEM',
-		}
-	},
-	// this is 2nd arguement, not part of the Event{}
+	{ type: 'SERVICE.DELETE.ITEM' },
+	// designating who to receive this event
 	{ to: 'ItemService' },
 )
 

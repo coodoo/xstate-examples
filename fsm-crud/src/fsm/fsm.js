@@ -1,3 +1,6 @@
+import { send, assign } from 'xstate'
+import { getItemById } from '../utils/helpers'
+
 export const fsm = {
 	id: 'Root',
 
@@ -44,10 +47,12 @@ export const fsm = {
 					},
 					{
 						target: ['#Root.main.details'],
-						cond: 'cancelToMaster',
+						cond: 'cancelToDetails',
 						actions: ['deleteItem'],
 					},
 				],
+
+
 
 				// optimistic result - delete item
 				OPTIMISTIC_DELETE_ITEM_SUCCESS: [
@@ -97,7 +102,8 @@ export const fsm = {
 				MODAL_ITEM_DELETE_CONFIRM: [
 					{
 						target: ['#Root.main.master'],
-						actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+						// actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
+						actions: ['remoteDeleteItem'],
 					},
 				],
 				MODAL_ITEM_DELETE_CANCEL: [
@@ -114,15 +120,13 @@ export const fsm = {
 				],
 			},
 
+			initial: 'loading',
+
 			states: {
 
 				//
 				loading: {
-					entry: [
-						{
-							type: 'reloadItems',
-						},
-					],
+					entry: 'reloadItems',
 					on: {
 						LOAD_ITEM_FAIL: [
 							{
@@ -174,27 +178,6 @@ export const fsm = {
 								actions: [],
 							},
 						],
-
-						// MODAL_ITEM_DELETE_CONFIRM: [
-						// 	{
-						// 		target: ['#Root.main.master'],
-						// 		actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
-						// 	},
-						// ],
-						// MODAL_ITEM_DELETE_CANCEL: [
-						// 	{
-						// 		target: ['#Root.main.master'],
-						// 		cond: 'backToMaster',
-						// 		actions: ['modalReset'],
-						// 	},
-						// 	{
-						// 		target: ['#Root.main.details'],
-						// 		cond: 'backToDetails',
-						// 		actions: ['modalReset'],
-						// 	},
-						// ],
-
-
 					},
 				},
 
@@ -207,24 +190,6 @@ export const fsm = {
 								target: ['#Root.main.master'],
 							},
 						],
-						// MODAL_ITEM_DELETE_CONFIRM: [
-						// 	{
-						// 		target: ['#Root.main.master'],
-						// 		actions: ['modalReset', 'localDeleteItem', 'remoteDeleteItem'],
-						// 	},
-						// ],
-						// MODAL_ITEM_DELETE_CANCEL: [
-						// 	{
-						// 		target: ['#Root.main.master'],
-						// 		cond: 'backToMaster',
-						// 		actions: ['modalReset'],
-						// 	},
-						// 	{
-						// 		target: ['#Root.main.details'],
-						// 		cond: 'backToDetails',
-						// 		actions: ['modalReset'],
-						// 	},
-						// ],
 					},
 				},
 
@@ -276,7 +241,6 @@ export const fsm = {
 					},
 				},
 			},
-			initial: 'loading',
 		},
 
 		global: {
@@ -301,5 +265,4 @@ export const fsm = {
 			},
 		},
 	},
-	on: {},
 }

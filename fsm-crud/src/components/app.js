@@ -92,13 +92,13 @@ const ItemNew = props => {
 		}
 
 		send({
-			type: 'newItemSubmit',
+			type: 'NEW_ITEM_SUBMIT',
 			payload: newItem,
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'newItemCancel' })
+		send({ type: 'NEW_ITEM_CANCEL' })
 	}
 
 	const handleChange = e => {
@@ -130,13 +130,13 @@ const ItemEdit = props => {
 
 	const handleSubmit = () => {
 		send({
-			type: 'editSubmit',
+			type: 'ITEM_EDIT_SUBMIT',
 			payload: { id, label: content },
 		})
 	}
 
 	const handleCancel = () => {
-		send({ type: 'editCancel' })
+		send({ type: 'ITEM_EDIT_CANCEL' })
 	}
 
 	const handleChange = e => {
@@ -171,19 +171,9 @@ const Details = props => {
 	const { id, label } = selectedItem
 
 	const handleDelete = () => {
-		// prepare modal data to be displayed
-		const modalData = {
-			type: 'MODAL_DELETE',
-			title: 'Item Removal Confirmation',
-			content: `Are you sure to delete ${selectedItem.label}?`,
-			data: selectedItem,
-			exitModalTo: 'details',
-		}
-
-		// then dispatch the modal data
 		send({
-			type: 'itemDelete',
-			modalData,
+			type: 'ITEM_DELETE',
+			from: 'details',
 		})
 	}
 
@@ -196,14 +186,14 @@ const Details = props => {
 				onClick={() =>
 					send({
 						type: 'ITEM_NEW',
-						exitTo: 'details', // click 'cancel' will go back to detail screen
+						from: 'details', // click 'cancel' will go back to detail screen
 					})
 				}
 			>
 				New
 			</button>
-			<button onClick={() => send({ type: 'itemEdit', exitTo:'details' })}>Edit</button>
-			<button onClick={() => send({ type: 'itemBack' })}>Back</button>
+			<button onClick={() => send({ type: 'ITEM_EDIT', from:'details' })}>Edit</button>
+			<button onClick={() => send({ type: 'ITEM_BACK' })}>Back</button>
 			<button onClick={handleDelete}>Delete</button>
 		</div>
 	)
@@ -220,7 +210,7 @@ const Listing = props => {
 		//
 		send({
 			type: 'ITEM_DELETE',
-			target,
+			from: 'master'
 		})
 	}
 
@@ -228,7 +218,7 @@ const Listing = props => {
 		send({
 			type: 'ITEM_DETAILS',
 			item: itm,
-			exitTo: 'master',
+			from: 'master',
 		})
 	}
 
@@ -269,8 +259,8 @@ const Listing = props => {
 				id='btnAdd'
 				onClick={() =>
 					send({
-						type: 'itemNew',
-						exitTo: 'master', // click 'cancel' will go back to listing screen
+						type: 'ITEM_NEW',
+						from: 'master', // click 'cancel' will go back to listing screen
 					})
 				}
 			>
@@ -279,7 +269,7 @@ const Listing = props => {
 
 			<button
 				id='btnEdit'
-				onClick={() => send({ type: 'itemEdit', exitTo: 'master' })}
+				onClick={() => send({ type: 'ITEM_EDIT', from: 'master' })}
 				disabled={!btnEnabled}
 			>
 				Edit
@@ -290,40 +280,15 @@ const Listing = props => {
 				onClick={() => handleDelete(null)}
 				disabled={!btnEnabled}
 			>
-				Remove
+				Delete
 			</button>
 
 			<button
 				id='btnReload'
-				onClick={() => send({ type: 'itemReload' })}
+				onClick={() => send({ type: 'ITEM_RELOAD' })}
 			>
 				Reload
 			</button>
-
-			{/*<button
-				id='btnTest'
-				onClick={() => {
-
-					// this is to show request could be cancelled any time, using one of following two approaches
-
-					// might as well use DOM api
-					// if(signal.current)
-					// 	signal.current.abort()
-					// const controller = new AbortController()
-					// signal.current = controller
-					// send({ type: test, signal: signal.current.signal })
-
-					// cancel previous request first
-					if(signal.current)
-						signal.current.cancel = true
-
-					// then send next request
-					signal.current = { cancel: false }
-					send({ type: 'test', signal: signal.current })
-				}}
-			>
-				Test
-			</button>*/}
 		</div>
 	)
 }
@@ -360,18 +325,13 @@ const getItemById = (items, id) => items.find(it => it.id === id)
 const App = props => {
 	const { state, send } = useContext(MyContext)
 
-	console.log( '\nApp',  )
-
-	// console.log('\n[State] = ', state.value, '\n[context] = ', state.context)
-	// console.log('\n[context] = ', state.context)
-
 	const { notifications } = state.context
 
 	const listing = !state.matches('main.master') ? null : <Listing />
 
-	const itemEdit = !state.matches('main.edit') ? null : <ItemEdit />
+	const itemEdit = !state.matches('main.editItem') ? null : <ItemEdit />
 
-	const itemNew = !state.matches('main.new') ? null : <ItemNew />
+	const itemNew = !state.matches('main.newItem') ? null : <ItemNew />
 
 	const details = !state.matches('main.details') ? null : <Details />
 
@@ -411,7 +371,7 @@ export const Wrap = () => {
 		service.current = interpret(machine)
 		.onTransition( state => {
 			// init event
-			if(state.changed === undefined) return
+			// if(state.changed === undefined) return
 
 			// DEBUG
 			if( state.changed === false ){
@@ -433,6 +393,7 @@ export const Wrap = () => {
 			dumpState(state.value)
 			console.log( 'ctx=', state.context )
 			console.log( 'evt=', state.event )
+			console.log( 'service: ', service.current )
 			console.log( '⬆️ - - - - - - - - - - -\n',  )
 
 			// re-render if the state changed
