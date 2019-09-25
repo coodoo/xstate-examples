@@ -115,8 +115,6 @@ export function useMachine<TContext, TEvent extends EventObject>(
 }
 
 
-
-
 /*
 	service
 */
@@ -168,12 +166,16 @@ export function useService<TContext, TEvent extends EventObject>(
 export function useActor<TC, TE extends EventObject>(
   actor?: Actor<TC, TE>
 ): [TC | undefined, Actor<TC, TE>['send']] {
+
   const [current, setCurrent] = useState<TC | undefined>(undefined);
+
   const actorRef = useRef<Actor<TC, TE> | undefined>(actor);
 
   useEffect(() => {
     if (actor) {
       actorRef.current = actor;
+
+      // 注意這裏 subscribe() 就是聽事件，因此 setCurrent 就是將最新事件存起來
       const sub = actor.subscribe(setCurrent);
 
       return () => {

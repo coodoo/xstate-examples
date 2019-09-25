@@ -51,8 +51,10 @@ const childMachine = Machine({
 })
 
 export const reloadItems = assign((ctx, evt) => {
-	// spawn 出一個 Interpreter
+	console.log( '✅✅ reload 跑 ✅✅',  )
+	// spawn 出一個 Interpreter{ id, send, subscribe ...}
 	ctx.ref = spawn(childMachine, 'SpawnedMachine')
+// debugger	//
 })
 
 
@@ -81,7 +83,7 @@ const counterInterval = (callback, receive) => {
 }
 
 export const reloadItems = assign((ctx, evt) => {
-	// spawn 出一個 {id: "barbar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
+	// spawn 出一個 Actor{ id: "barbar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
 	ctx.ref = spawn( counterInterval, 'barbar' )
 })
 */
@@ -89,7 +91,7 @@ export const reloadItems = assign((ctx, evt) => {
 // spawn Promise
 /*
 export const reloadItems = assign((ctx, evt) => {
-	// spawn 出 {id: "foobar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
+	// spawn 出 Actor{ id: "foobar", send: ƒ, subscribe: ƒ, stop: ƒ, toJSON: ƒ}
 	ctx.ref = spawn(services.loadItems(), 'foobar')
 	debugger	//
 })
