@@ -405,7 +405,7 @@ export const Wrap = () => {
 	// didMount
 	useEffect(() => {
 	  return () => {
-	    service.stop()
+	    service.current.stop()
 	  }
 	}, [service.current])
 
