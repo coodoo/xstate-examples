@@ -358,63 +358,12 @@ const App = props => {
 
 export const Wrap = () => {
 
-	// console.log( '\nWrap run'  )
-
 	const [ state, send ] = useMachineEx(machine, { debug: true, name: 'Parent'})
-
-	/*const [_, forceUpdate] = useState(0)
-	const once = useRef(false)
-	const service = useRef()
-
-	// this is the constructur, make sure it only runs once
-	if(once.current === false){
-		once.current = true
-
-		service.current = interpret(machine)
-		.onTransition( state => {
-			// init event
-			// if(state.changed === undefined) return
-
-			// DEBUG
-			if( state.changed === false ){
-				console.error(
-					`\n\n💣💣💣 [UNHANDLED EVENT]💣💣💣\nEvent=`,
-					state.event,
-
-					'\nState=',
-					state.value, state,
-
-					'\nContext=',
-					state.context,
-					'\n\n' )
-
-				return
-			}
-
-			console.log( '\n⬇️⬇️ - - - - - - - - - - -',  )
-			dumpState(state.value)
-			console.log( 'ctx=', state.context )
-			console.log( 'evt=', state.event )
-			console.log( '⬆️ - - - - - - - - - - -\n',  )
-
-			// re-render if the state changed
-			forceUpdate(x => x+1)
-		})
-
-		service.current.start()
-	}
-
-	// didMount
-	useEffect(() => {
-	  return () => {
-	    service.stop()
-	  }
-	}, [service.current])*/
 
 	return (
 		<MyContext.Provider value={{
-			state: service.current.state,
-			send: service.current.send
+			state: state,
+			send: send
 		}}>
 			<App />
 		</MyContext.Provider>
