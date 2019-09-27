@@ -1,7 +1,7 @@
 /* eslint-disable*/
 import React, { useEffect, useState, useRef, useContext, memo } from 'react'
 
-import { useMachine, useService } from '@xstate/react'
+import { useMachineEx } from '../utils/useMyHooks'
 import { interpret } from 'xstate'
 import { machine, } from '../fsm/machine'
 import { randomId, dumpState, stateValuesEqual } from '../utils/helpers'
@@ -360,7 +360,9 @@ export const Wrap = () => {
 
 	// console.log( '\nWrap run'  )
 
-	const [_, forceUpdate] = useState(0)
+	const [ state, send ] = useMachineEx(machine, { debug: true, name: 'Parent'})
+
+	/*const [_, forceUpdate] = useState(0)
 	const once = useRef(false)
 	const service = useRef()
 
@@ -407,7 +409,7 @@ export const Wrap = () => {
 	  return () => {
 	    service.stop()
 	  }
-	}, [service.current])
+	}, [service.current])*/
 
 	return (
 		<MyContext.Provider value={{

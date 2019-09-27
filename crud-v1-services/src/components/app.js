@@ -407,11 +407,6 @@ const App = props => {
 
 
 export const Wrap = () => {
-	// console.log( '\nWrap run'  )
-
-	const [_, forceUpdate] = useState(0)
-	const once = useRef(false)
-	const service = useRef()
 
 	const notify = msg => toaster.notify(msg, {
 		position: 'bottom-right',
