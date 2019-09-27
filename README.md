@@ -29,11 +29,9 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - This is by far the most complex example, it showcased how to use the latest `Actor` model for communication between child components and their parent.
 
-- Pay attention to how `TodosMachine` spawned child `TodoMachine`s and pass it's ref to each child component as a local single truth that handles the component state.
+- Pay attention to how `TodosMachine` spawned child `TodoMachine`s and pass it's ref to each child component as a local single truth that handles the component state., more details in the folder's `Readme.md`
 
-- More details in the folder's `Readme.md`
-
-- `Service` and `Actor` are basically the same thing but used differently, rule of thumb:
+- In short, `Service` and `Actor` are basically the same thing but used differently, rule of thumb:
 
 	- Statically invoke services (you have to write the service invocation in machine statemenet in advance)
 	- Dynamically spawn actors (you can spawn new actors in all events whenever needed)
