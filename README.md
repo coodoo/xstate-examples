@@ -33,8 +33,8 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - In short, `Service` and `Actor` are basically the same thing but used differently, rule of thumb:
 
-	- Statically invoke services (you have to write the service invocation in machine statemenet in advance)
-	- Dynamically spawn actors (you can spawn new actors in all events whenever needed)
+	- Statically invoke services (you have to write all services in machine statemenet in advance)
+	- Dynamically spawn actors (you can spawn new actors from any events whenever needed)
 
 ## Notes
 
