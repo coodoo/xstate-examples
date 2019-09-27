@@ -24,6 +24,7 @@ export const fsm = {
 			],
 
 			states: {
+
 				//
 				loading: {
 					// when entrying 'entry' state, run 'reloadItems' action
@@ -31,6 +32,7 @@ export const fsm = {
 					entry: 'reloadItems',
 				},
 
+				//
 				'loadFailed': {
 					on: {
 						modalDataErrorClose: {

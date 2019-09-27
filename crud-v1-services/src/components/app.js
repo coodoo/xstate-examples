@@ -255,9 +255,6 @@ const Listing = props => {
 				{itm.id} - {itm.label}
 			</span>
 			{<button onClick={() => handleViewDetails(itm)}>🔎</button>}
-			{/*
-			{<button onClick={() => handleDelete(itm)}>❌</button>}
-			*/}
 		</div>
 	))
 
