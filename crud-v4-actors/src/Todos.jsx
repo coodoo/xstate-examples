@@ -43,7 +43,7 @@ const persistedTodosMachine = todosMachine.withConfig(
 
 export function Todos() {
 
-  const [state, send ] = useMachineEx(persistedTodosMachine, {debug: true, name: 'Parent'});
+  const [state, send ] = useMachineEx(persistedTodosMachine, {}, {debug: true, name: 'Parent'});
 
   console.log( '\nParent render'  )
 

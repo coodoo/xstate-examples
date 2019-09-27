@@ -4,25 +4,24 @@ import {
 } from 'xstate'
 
 // machine is raw state machine, will run it with the interpreter
-export const useMachineEx = (machine, { debug=false, name=''}) => {
+export const useMachineEx = (machine, { debug=false, name='', interpreterOptions={}}) => {
 
 	// eslint-disable-next-line
 	const [_, force] = useState(0)
-	const lastRef = useRef(null)
+	const machineRef = useRef(null)
 	const serviceRef = useRef() // started Interpreter
 
-	if(lastRef.current !== machine){
+	if(machineRef.current !== machine){
 
-		lastRef.current = machine
+		machineRef.current = machine
 
-		serviceRef.current = interpret(machine)
+		serviceRef.current = interpret(machineRef.current, interpreterOptions)
 		.onTransition( state => {
 
 			if(state.event.type === 'xstate.init') {
 				// debugger	//
 				return
 			}
-
 			//
 			if( state.changed === false && debug === true ){
 				console.error(
@@ -52,13 +51,18 @@ export const useMachineEx = (machine, { debug=false, name=''}) => {
 			force(x => x+1)
 		})
 
+		// start immediately, as it's in the constructor
 		serviceRef.current.start()
 	}
 
 	// didMount
 	useEffect(() => {
-	  return () => serviceRef.current.stop()
-	})
+	  return () => {
+	  	debugger	//
+	  	console.log( 'useMachine unload 了',  )
+	  	serviceRef.current.stop()
+	  }
+	}, [])
 
 	return [serviceRef.current.state, serviceRef.current.send, serviceRef.current]
 }

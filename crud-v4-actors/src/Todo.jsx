@@ -17,7 +17,7 @@ export const Todo = ({ todoRef }) => {
   	}
   }, [state, isEditing])
 
-	console.log( '\nChild render')
+	console.log( '\n\tChild render')
 
 	return (
 		<li
