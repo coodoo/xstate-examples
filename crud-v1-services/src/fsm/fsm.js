@@ -104,10 +104,18 @@ export const fsm = {
 						editCancel: {
 							target: 'unknown',
 						},
-						editSubmit: {
-							target: 'details',
-							actions: 'editSubmit',
-						},
+						editSubmit: [
+							{
+								target: 'master',
+								cond: 'unknownMaster',
+								actions: 'editSubmit',
+							},
+							{
+								target: 'details',
+								cond: 'unknownDetails',
+								actions: 'editSubmit',
+							},
+						],
 					},
 				},
 

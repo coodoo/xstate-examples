@@ -13,7 +13,7 @@ export const useMachineEx = (machine, { debug=false, name='', interpreterOptions
 	if(machineRef.current !== machine){
 
 		machineRef.current = machine
-console.log( '跑跑',  )
+
 		serviceRef.current = interpret(machineRef.current, interpreterOptions)
 		.onTransition( state => {
 
