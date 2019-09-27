@@ -19,9 +19,9 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ### `crud-v3-promises`
 
-- `v3` is a slightly differnt version based on `v2` using a different `invoked` Service called `Promise`, pay attention to `services.js` and see `loadItems` and `deleteItem`
+- `v3` is a slightly differnt version based on `v2` using a different `invoked` Service called `Promise`, pay attention to `services.js` and see how `loadItems` and `deleteItem` worked.
 
-- Key different between `Callback` and `Promise` service is you get to dispatch events back to the parent just once with `Promise`, whereas in `Callback` you could use `cb` and `onReceive` to dispatch events multiple times, each has it's own place.
+- Key different between `Callback` and `Promise` service is you get to dispatch events back to the parent just once with `Promise`, whereas in `Callback` you could use `cb` and `onReceive` functions to dispatch events multiple times, both has it's own place in an application, hence this example.
 
 ### `crud-v4-actors`
 
