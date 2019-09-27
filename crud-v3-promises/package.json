@@ -6,7 +6,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "@testing-library/jest-dom": "^4.0.0",
+    "@testing-library/jest-dom": "^4.1.0",
     "@welldone-software/why-did-you-render": "^3.3.5",
     "@xstate/react": "^0.7.1",
     "classnames": "^2.2.6",
@@ -16,7 +16,7 @@
     "react-scripts": "3.1.2",
     "react-spring": "^8.0.27",
     "react-testing-library": "^8.0.1",
-    "styled-components": "^4.3.2",
+    "styled-components": "^4.4.0",
     "toasted-notes": "^3.0.0",
     "todomvc-app-css": "^2.2.0",
     "todomvc-common": "^1.0.5",

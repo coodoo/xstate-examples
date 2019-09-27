@@ -56,7 +56,6 @@ export const fsm = {
 
 				//
 				loading: {
-					// entry: 'reloadItems',
 					invoke: {
 						id: 'LoadSomeItems',
 						src: 'loadItems',
