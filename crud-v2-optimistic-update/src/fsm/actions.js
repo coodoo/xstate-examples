@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { send, assign } from 'xstate'
 import { getItemById } from '../utils/helpers'
 import toaster from 'toasted-notes'
@@ -33,7 +32,6 @@ export const listDataError = assign((ctx, e) => {
 -------------------------------------------------- */
 
 export const deleteItem = assign((ctx, e) => {
-	const { from } = e
 	const selectedItem = getItemById(ctx.items, ctx.selectedItemId)
 	ctx.modalData = {
 		title: 'Item Removal Confirmation',
