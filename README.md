@@ -5,7 +5,7 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ## Core features of each example
 
-### 1. crud-v1-services
+### `crud-v1-services`
 
 - a typical CRUD apps showing how to model application states with `statechart` and implement the basic functionalities in `xstate`, pay attention to how `invoked` Services are used to serve different API calls.
 
@@ -13,17 +13,17 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - Read about different kind of [Services here](https://xstate.js.org/docs/guides/communication.html#invoking-services)
 
-### 2. crud-v2-optimistic-update
+### `crud-v2-optimistic-update`
 
 - `v2` is built upon `v1`, but with more delicate handling of `optimistic update` processing and used more child state for modeling the app, observe how `parallel` states were used to handle different steps of an operation.
 
-### 3. crud-v3-promises
+### `crud-v3-promises`
 
 - `v3` is a slightly differnt version based on `v2` using a different `invoked` Service called `Promise`, pay attention to `services.js` and see `loadItems` and `deleteItem`
 
 - Key different between `Callback` and `Promise` service is you get to dispatch events back to the parent just once with `Promise`, whereas in `Callback` you could use `cb` and `onReceive` to dispatch events multiple times, each has it's own place.
 
-### 4. crud-v4-actors
+### `crud-v4-actors`
 
 - `v4` is based on David's [TodoMVC](https://codesandbox.io/s/xstate-todomvc-33wr94qv1) example but with a couple of improvements.
 
