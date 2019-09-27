@@ -11,8 +11,6 @@ import {
 	current,
 } from './helpers'
 
-import { StateChart } from '@statecharts/xstate-viz'
-
 export const App = () => {
 
 	// fsm hook - 這是唯一用到 useState 的地方
@@ -193,8 +191,6 @@ export const App = () => {
 		window.addEventListener('keydown', handleKeyDown )
 	  return () => window.removeEventListener('keydown', handleKeyDown )
 	});
-
-	// return <StateChart machine={machine} />
 
 	return (
 	  <div
