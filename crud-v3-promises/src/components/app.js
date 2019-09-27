@@ -1,18 +1,13 @@
-/* eslint-disable*/
-import React, { useEffect, useState, useRef, useContext, memo } from 'react'
+/* eslint-disable jsx-a11y/accessible-emoji */
+import React, { useState, useContext } from 'react'
 
 import { useMachineEx } from '../utils/useMyHooks'
-import { interpret } from 'xstate'
 import { machine, } from '../fsm/machine'
-import { randomId, dumpState, stateValuesEqual } from '../utils/helpers'
+import { randomId } from '../utils/helpers'
 
-import styled, { createGlobalStyle } from 'styled-components'
+import styled from 'styled-components'
 
 import '../components/styles.css'
-
-// import whyDidYouRender from '@welldone-software/why-did-you-render'
-// whyDidYouRender(React)
-
 
 // to store { state, send } from fsm
 const MyContext = React.createContext()
@@ -205,9 +200,6 @@ const Listing = props => {
 	const { items, selectedItemId } = state.context
 
 	const handleDelete = itm => {
-		const target = itm ? itm : getItemById(items, selectedItemId)
-
-		//
 		send({
 			type: 'ITEM_DELETE',
 			from: 'master'
@@ -242,9 +234,6 @@ const Listing = props => {
 			{<button onClick={() => handleViewDetails(itm)}>🔎</button>}
 		</div>
 	))
-
-	// test: showing requests could be cancelled
-	const signal = useRef(null)
 
 	const btnEnabled = state.matches('global.selection.selected')
 
@@ -296,6 +285,7 @@ const Listing = props => {
 //
 const getModal = () => {
 
+	// eslint-disable-next-line
 	const { state } = useContext(MyContext)
 	const { modalData } = state.context
 
@@ -323,9 +313,8 @@ const getItemById = (items, id) => items.find(it => it.id === id)
 
 // main app
 const App = props => {
-	const { state, send } = useContext(MyContext)
 
-	const { notifications } = state.context
+	const { state } = useContext(MyContext)
 
 	const listing = !state.matches('main.master') ? null : <Listing />
 
@@ -369,6 +358,3 @@ export const Wrap = () => {
 		</MyContext.Provider>
 	)
 }
-
-// App.whyDidYouRender = true
-// Wrap.whyDidYouRender = true

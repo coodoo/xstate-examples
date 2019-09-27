@@ -1,13 +1,9 @@
-/* eslint-disable */
 import { randomId, random, getItemById } from '../utils/helpers'
 
 // A Callback service
 // cb() let's up dispatch event to the parent
 // onReceive() allows us to receive events from the parent while the service is running
 export const itemService = (ctx, e) => (cb, onReceive) => {
-	let cnt = 0
-	let cancelled = false
-	let retries = 0
 
 	onReceive(evt => {
 		switch (evt.type) {
@@ -53,7 +49,9 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 			// edit item
 			case 'SERVICE.EDIT.ITEM':
 
+				// eslint-disable-next-line
 				const { editedItem, oldItem } = evt
+
 				// async side effect
 				return new Promise((resolve, reject) => {
 
@@ -129,6 +127,8 @@ export const loadItems = (ctx, e) => {
 //
 export const deleteItem = (ctx, e) => {
 	const { selectedItemId } = ctx
+
+	// eslint-disable-next-line
 	const item = getItemById(ctx.items, selectedItemId)
 
 	// delete local item immediately

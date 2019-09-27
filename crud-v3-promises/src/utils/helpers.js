@@ -1,9 +1,7 @@
-/* eslint-disable */
-
-import { sprintf } from 'sprintf-js'
 
 export const uuid = () => {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+  	// eslint-disable-next-line
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   )
 }
@@ -44,7 +42,7 @@ export const dump = svc => {
 			'\n--------------------------------------',
 		)
 	}else{
-		console.log( '是空的: ', svc )
+		console.log( 'Empty: ', svc )
 	}
 }
 
@@ -65,29 +63,6 @@ export const random = (min=0, max=999) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-
-export function stateValuesEqual(a, b) {
-  if (a === b) {
-    return true;
-  }
-
-  if (a === undefined || b === undefined) {
-    return false;
-  }
-
-  if (isString(a) || isString(b)) {
-    return a === b;
-  }
-
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-
-  return (
-    aKeys.length === bKeys.length &&
-    aKeys.every(key => stateValuesEqual(a[key], b[key]))
-  );
 }
 
 export const getItemById = (items, id) => items.find(it => it.id === id)
