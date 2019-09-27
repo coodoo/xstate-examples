@@ -15,7 +15,7 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ### `crud-v2-optimistic-update`
 
-- `v2` is built upon `v1`, but with more delicate handling of `optimistic update` processing and used more child state for modeling the app, observe how `parallel` states were used to handle different steps of an operation.
+- `v2` is built upon `v1`, but with more delicate handling of `optimistic update` processing and used different child state to model the app, observe how `parallel` states were used to handle different steps of each operation also pay attention to both `happy` and `sorrow` paths.
 
 ### `crud-v3-promises`
 
