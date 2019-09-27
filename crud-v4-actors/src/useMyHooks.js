@@ -58,8 +58,7 @@ export const useMachineEx = (machine, { debug=false, name='', interpreterOptions
 	// didMount
 	useEffect(() => {
 	  return () => {
-	  	debugger	//
-	  	console.log( 'useMachine unload 了',  )
+	  	console.log( 'useMachine unload')
 	  	serviceRef.current.stop()
 	  }
 	}, [])
