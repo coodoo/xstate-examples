@@ -1,14 +1,10 @@
-/* eslint-disable */
 import { randomId, random } from '../utils/helpers'
 
 // A Callback service
 // cb() let's up dispatch event to the parent
 // onReceive() allows us to receive events from the parent while the service is running
 export const itemService = (ctx, e) => (cb, onReceive) => {
-	let cnt = 0
-	let cancelled = false
-	let retries = 0
-
+	//
 	onReceive(evt => {
 		switch (evt.type) {
 
@@ -29,7 +25,9 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 
 				console.log( '\nfetched: ', arr )
 
+				// eslint-disable-next-line
 				const t = random(300, 2000)
+
 				setTimeout(() => {
 
 					// for test only
@@ -118,103 +116,8 @@ export const itemService = (ctx, e) => (cb, onReceive) => {
 					})
 				})
 
-			// demo: multiple requests with cancellation
-			case 'test':
-				const requestId = ++cnt
-
-				console.log('[test request started]', requestId)
-
-				return new Promise((resolve, reject) => {
-					setTimeout(() => {
-						resolve({
-							info: `Request ${requestId} completed`,
-						})
-						// reject({
-						// 	info: `Request ${requestId} failed`,
-						// })
-					}, 1500)
-				})
-
-					.then(result => {
-						console.log('cancelled?', cancelled)
-						cb({
-							type: 'modalDeleteItemSuccess',
-							result,
-						})
-					})
-
-					.catch(error => {
-						cb({
-							type: 'modalDeleteItemFail',
-							error,
-						})
-					})
-
 			default:
 				console.log('unhandled method call=', evt.type)
 		}
 	})
 }
-
-// Callback service, which could dispatch event multiple times to it's parent
-/*export const cancelService = (ctx, e) => (cb, onReceive) => {
-
-	let cnt = 0
-
-	onReceive(evt => {
-
-		switch( evt.type ){
-
-			case 'test':
-
-				const requestId = ++cnt
-				const signal = evt.signal
-
-				console.log( '[Service test]', requestId, evt )
-
-				new Promise((resolve, reject) => {
-
-					setTimeout(() => {
-						resolve({
-							info: `Request ${requestId} completed`,
-						})
-						// reject({
-						// 	info: `Request ${requestId} failed`,
-						// })
-					}, 1000)
-				})
-
-				.then( result => {
-
-					// using DOM api
-					// if(signal.aborted === true){
-
-					if(signal.cancel===true){
-						console.log( '\n\n[Service cancelled]', requestId)
-					}else{
-						console.log( '\n\n[Service not cancelled]', requestId )
-						cb({
-							type: 'testResult',
-							result
-						})
-					}
-
-				})
-
-				.catch( error => {
-					return
-					cb({
-						type: 'testError',
-						error
-					})
-				})
-
-				break
-
-			default:
-				console.log( 'Unhandled method call=', evt.type  )
-		}
-	})
-
-}
-*/

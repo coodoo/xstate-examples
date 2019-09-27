@@ -57,17 +57,6 @@ export const fsm = {
 							target: 'edit',
 							actions: 'setExitTo',
 						},
-
-						// Test: multiple request and cancellation
-						test: {
-							actions: 'testAction',
-						},
-						testResult: {
-							actions: 'testResultAction',
-						},
-						testError: {
-							actions: '',
-						},
 					},
 				},
 
@@ -180,10 +169,6 @@ export const fsm = {
 
 				clearNotification: {
 					actions: 'clearNotification',
-				},
-
-				testMe: {
-					actions: 'testMe',
 				},
 			},
 		},

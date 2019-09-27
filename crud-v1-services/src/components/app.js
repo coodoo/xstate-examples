@@ -15,7 +15,6 @@ import '../components/styles.css'
 // import whyDidYouRender from '@welldone-software/why-did-you-render'
 // whyDidYouRender(React)
 
-
 // to store { state, send } from fsm
 const MyContext = React.createContext()
 

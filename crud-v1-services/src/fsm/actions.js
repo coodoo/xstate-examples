@@ -6,7 +6,6 @@ export const reloadItems = send(
 )
 
 export const listDataSuccess = assign((ctx, evt) => {
-	// console.log( '[listDataSuccess]', evt )
 	ctx.items = evt.data
 	ctx.notify('Data fetched 1')
 	ctx.notify('Data fetched 2')
@@ -159,4 +158,3 @@ export const testMe = assign((ctx, e) => {
 export const itemDelete = assign((ctx, e) => {
 	ctx.modalData = e.modalData
 })
-
