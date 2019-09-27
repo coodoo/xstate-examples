@@ -42,6 +42,6 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ## Todo
 
-	- Rewrite tests
+- Rewrite tests
 
-	- Enable `whyDidYouRender` to see if there's any unnecesary re-renders
+- Enable `whyDidYouRender` to see if there's any unnecesary re-renders
