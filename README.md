@@ -7,9 +7,9 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ### `crud-v1-services`
 
-- a typical CRUD apps showing how to model application states with `statechart` and implement the basic functionalities in `xstate`, pay attention to how `invoked` Services are used to serve different API calls.
+- A typical CRUD app showing how to `model` application states with `statechart` and implement the basic functionalities in `xstate`, pay attention to how `invoked` Services are used to serve different API calls.
 
-- There are four kind of services -- Promise, Callback, Observable and Machine, `v1` is focused on `Callback`, for that it's the most commonly used services in real world application.
+- There are four kind of services in `xstate`, which are `Promise, Callback, Observable and Machine`, for this example we are focused on `Callback` because it's the most commonly used services in a real world application.
 
 - Read about different kind of [Services here](https://xstate.js.org/docs/guides/communication.html#invoking-services)
 
