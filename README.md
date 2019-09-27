@@ -27,9 +27,9 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - `v4` is based on David's [TodoMVC](https://codesandbox.io/s/xstate-todomvc-33wr94qv1) example but with a couple of improvements.
 
-- This is the most complex one of all examples, for that it showcased how to use the latest and greatest `Actor` model for communication between child components and their parent.
+- This is by far the most complex example, it showcased how to use the latest `Actor` model for communication between child components and their parent.
 
-- Pay attention to how `TodosMachine` spawn child `TodoMachine` and pass it's ref to each child component as a local single truth of handling component state.
+- Pay attention to how `TodosMachine` spawned child `TodoMachine`s and pass it's ref to each child component as a local single truth that handles the component state.
 
 - More details in the folder's `Readme.md`
 
