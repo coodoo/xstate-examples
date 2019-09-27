@@ -1,42 +1,48 @@
 
-These examples showcased practical use cases of `statecharts` using `xstate`.
+## Here are four examples showing different usages of xstate.
 
-It is recommend to start with `fsm-crud` which demonstrateed the most basic operations one might need on a daily basis.
+Each of the example showcased different approaches of using `xstate`, each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and moving forward from there.
 
-`service-3-actor` is the most complex and up to date example that showcased how to model and implement concurrency using `statecharts` in an `actor` manner.
+## Core features of each example
 
-## The goal of each example is listed below.
+### crud-v1-services
 
-- `fsm-crud`
-	- a typical CRUD apps but a bit more complex than normal `TodoMVC` example
+	- a typical CRUD apps showing how to model application states with `statechart` and implement the basic functionalities in `xstate`, pay attention to how `invoked` Services are used to serve different API calls.
 
-- `fsm-calc`
-	- a simple calculator as described in the textbook
+	- There are four kind of services -- Promise, Callback, Observable and Machine, `v1` is focused on `Callback`, for that it's the most commonly used services in real world application.
 
-- `fsm-word`
-	- showcase how parallel state could be useful when modeling complex program where states and ui didn't have 1:1 relationship
+	- Read about different kind of [Services here](https://xstate.js.org/docs/guides/communication.html#invoking-services)
 
-- `fsm-service-1-callback`
-	- simple approach of implementing multi-thread jobs with one service, each job could be pasued/resumed/cancelled
+### crud-v2-optimistic-update
 
-- `fsm-service-2-submachine`
-	- another way of implementing multi-thread jobs by letting each child component starts it's own sub-fsm, and using ui layer to piece together the whole operation
+	- `v2` is built upon `v1`, but with more delicate handling of `optimistic update` processing and used more child state for modeling the app, observe how `parallel` states were used to handle different steps of an operation.
 
-- `fsm-service-3-actor`
-	- the recommended way of implementing concurrency by creating multiple services and let them communicate with each other in a `actor` manner
+### crud-v3-promises
+	- `v3` is a slightly differnt version based on `v2` using a different `invoked` Service called `Promise`, pay attention to `services.js` and see `loadItems` and `deleteItem`
 
-## When to use what?
+	- Key different between `Callback` and `Promise` service is you get to dispatch events back to the parent just once with `Promise`, whereas in `Callback` you could use `cb` and `onReceive` to dispatch events multiple times, each has it's own place.
 
-If you are working on a typical `CRUD` style application, follow along `fsm-crud`.
+### crud-v4-actors
 
-If you need basic concurrency, follow along `service-1-callback`.
+	- `v4` is based on David's [TodoMVC](https://codesandbox.io/s/xstate-todomvc-33wr94qv1) example but with a couple of improvements.
 
-If you need complex concurrency and fine-grained control of each thread, follow along `service-3-actor`
+	- This is the most complex one of all examples, for that it showcased how to use the latest and greatest `Actor` model for communication between child components and their parent.
 
-If none of above can solve your problem, ping me, I might be of some help 😎
+	- Pay attention to how `TodosMachine` spawn child `TodoMachine` and pass it's ref to each child component as a local single truth of handling component state.
 
+	- More details in the folder's `Readme.md`
+
+	- `Service` and `Actor` are basically the same thing but used differently, rule of thumb:
+
+		- Statically invoke services (you have to write the service invocation in machine statemenet in advance)
+		- Dynamically spawn actors (you can spawn new actors in all events whenever needed)
+
+## Notes
+
+- PRs welcomed and feel free to open issues if you find any problem or questions.
 
 ## Todo
 
-	- Revise tests
+	- Rewrite tests
+
 	- Enable `whyDidYouRender` to see if there's any unnecesary re-renders
