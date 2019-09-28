@@ -37,6 +37,8 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - Pay attention to how `TodosMachine` spawned child `TodoMachine`s and pass it's ref to each child component as a local single truth that handles the component state., more details in the folder's `Readme.md`
 
+- See detailed docs on [actor here](https://xstate.js.org/docs/guides/actors.html), this is something you don't want to miss 😎
+
 - In short, `Service` and `Actor` are basically the same thing but used differently, rule of thumb:
 
 	- Statically invoke services (you have to write all services in machine statemenet in advance)
@@ -46,7 +48,7 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ## Notes
 
-- PRs welcomed and feel free to open issues if you find any problem or questions.
+- PRs welcomed and feel free to open issues for any bugs or question you might have.
 
 ## Todo
 
