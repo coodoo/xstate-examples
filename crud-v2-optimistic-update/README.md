@@ -57,6 +57,9 @@ optimisticPending: {
 }
 ```
 
+- Notice `toaster.notify()` was treated as a side effect and can be directly invoked inside `actions`, instead of delegating it via the ui.
+
+
 ## Statechart
 
 ![v2](https://user-images.githubusercontent.com/325936/65810692-f96ae680-e1df-11e9-9040-7ba0c3113abd.png)

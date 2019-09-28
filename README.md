@@ -48,6 +48,20 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 ## Notes
 
+- Generic naming convention for `states` and `events` are:
+
+	- `camelCaseForState`
+
+	- `UPPER.CASE.FOR.EVENT`
+
+		- By using dot for event it is possible in the future to implement wildcase event matching, for example `UPPER.*` to match all events starting with `UPPER`
+
+- Basic guiding rule for all these example are hoping to make `ui` a `dumb layer`
+	- meaning ui only does two things
+		- draw the user interface
+		- accept user inputs (keyboard/mouse events)
+	- then delegate those events to `xstate` to handle, where all business logics are encapsulated
+
 - PRs welcomed and feel free to open issues for any bugs or question you might have.
 
 ## Todo
