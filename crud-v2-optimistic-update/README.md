@@ -5,7 +5,7 @@ This is an alternative version of how to implement `optimistic update` with `par
 
 ## What to see in this example
 
-- Refactored optimistic update with more detailed states
+- Refactored implementation of `optimistic update` with more detailed states
 
 - Pay attentions to how the parallel state `optimisticPending` was designed and the events it's repsonsible for
 
