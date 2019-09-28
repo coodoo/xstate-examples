@@ -1,7 +1,7 @@
 
 ## Goals
 
-This is an alternative version of how to implement optimistic update with parallel states to give you a feel of it's power.
+This is an alternative version of how to implement `optimistic update` with `parallel` states to give you a feel of it's true power.
 
 ## What to see in this example
 
