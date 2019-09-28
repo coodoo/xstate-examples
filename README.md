@@ -56,7 +56,7 @@ All these examples are built with [StatesKit](https://stateskit.com) - a visual 
 
 	- `UPPER.CASE.FOR.EVENT`
 
-		- By using dot for event it is possible in the future to implement wildcase event matching, for example `UPPER.*` to match all events starting with `UPPER`
+		- By using `dots` for event it is possible in the future to implement wildcase event matching, for example `UPPER.*` to match all events starting with `UPPER`
 
 - Basic guiding rule for all these example are hoping to make `ui` a `dumb layer`
 	- meaning ui only does two things
