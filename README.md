@@ -3,6 +3,8 @@
 
 Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play, fork and report any issues you found here.
 
+PRs welcomed and feel free to open issues for any bugs or question you might have.
+
 ## Core features of each example
 
 ### `crud-v1-services`
@@ -61,8 +63,6 @@ Each one was built upon the previous one, hence it's recommended to start with `
 		- draw the user interface
 		- accept user inputs (keyboard/mouse events)
 	- then delegate those events to `xstate` to handle, where all business logics are encapsulated
-
-- PRs welcomed and feel free to open issues for any bugs or question you might have.
 
 ## Todo
 
