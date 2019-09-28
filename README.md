@@ -1,9 +1,7 @@
 
 ## Here are four examples showing different usages of xstate.
 
-Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play, fork and report any issues you found here.
-
-PRs welcomed and feel free to open issues for any bugs or question you might have.
+Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play and fork those example, and report any issues you found here, PRs welcomed too.
 
 All these examples are built with the help from [stateskit.com](https://stateskit.com)'s visual statechart editor, don't forget to try it out 😎
 
