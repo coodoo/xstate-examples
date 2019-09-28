@@ -13,15 +13,21 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 - Read about different kind of [Services here](https://xstate.js.org/docs/guides/communication.html#invoking-services)
 
+- Play on [[codesandbox]](https://codesandbox.io/s/crud-v1-services-fy1du)
+
 ### `crud-v2-optimistic-update`
 
 - `v2` is built upon `v1`, but with more delicate handling of `optimistic update` processing and used different child state to model the app, observe how `parallel` states were used to handle different steps of each operation also pay attention to both `happy` and `sorrow` paths.
+
+- Play on [[codesandbox]](https://codesandbox.io/s/crud-v2-optimistic-update-3bc58)
 
 ### `crud-v3-promises`
 
 - `v3` is a slightly differnt version based on `v2` using a different `invoked` Service called `Promise`, pay attention to `services.js` and see how `loadItems` and `deleteItem` worked.
 
 - Key different between `Callback` and `Promise` service is you get to dispatch events back to the parent just once with `Promise`, whereas in `Callback` you could use `cb` and `onReceive` functions to dispatch events multiple times, both has it's own place in an application, hence this example.
+
+- Play on [[codesandbox]](https://codesandbox.io/s/crud-v3-promises-h9d5t)
 
 ### `crud-v4-actors`
 
