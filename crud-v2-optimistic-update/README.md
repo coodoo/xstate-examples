@@ -36,5 +36,6 @@ Demonstrating how to model CRUD application with `xstate` using `parallel states
 
 ## Statechart
 
-![crud](https://user-images.githubusercontent.com/325936/57836016-67df7700-77f2-11e9-83ba-142c1ebd1680.png)
+![v2](https://user-images.githubusercontent.com/325936/65810692-f96ae680-e1df-11e9-9040-7ba0c3113abd.png)
+
 
