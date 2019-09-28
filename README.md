@@ -36,6 +36,8 @@ Each one was built upon the previous one, hence it's recommended to start with `
 	- Statically invoke services (you have to write all services in machine statemenet in advance)
 	- Dynamically spawn actors (you can spawn new actors from any events whenever needed)
 
+- Play on [[codesandbox]](https://codesandbox.io/s/crud-v4-actors-oxx7y)
+
 ## Notes
 
 - PRs welcomed and feel free to open issues if you find any problem or questions.
