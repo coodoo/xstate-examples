@@ -1,38 +1,60 @@
-This is a typical CRUD applicaiton with master|detail|modal screens.
-
-# What's new
-
-	- Refactored optimistic states
-	- Swap Callback service to Promise
-
-
 ## Goal
 
-Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
+This is an alternative version of how to implement optimistic update with parallel states to give you a feel of it's power.
 
-## Key Features
+## What to see in this example
 
-- switch between master|detail|modal screen by fsm states
+- Refactored optimistic update with more detailed states
 
-- optimistic update for create and delete of items
+- Pay attentions to how the parallel state `optimisticPending` was designed and the events it's repsonsible for
 
-- making context immutable with `xstate/immer`
+```
+optimisticPending: {
+	on: {
+		// optimistic result - delete item
+		OPTIMISTIC_DELETE_ITEM_SUCCESS: [
+			{
+				target: ['#Root.main.master', '#Root.global.selection.unSelected'],
+				actions: 'deleteOptimisticItemSuccess',
+			},
+		],
+		OPTIMISTIC_DELETE_ITEM_FAIL: [
+			{
+				target: ['#Root.main.master', '#Root.global.selection.selected'],
+				actions: 'restoreOptimisticDeleteItem',
+			},
+		],
 
-- use react `memo` to prevent unnecessary re-render
+		// optimistic result - create item
+		OPTIMISTIC_CREATE_ITEM_SUCCESS: [
+			{
+				target: ['#Root.main.master'],
+				actions: 'createOptimisticItemSuccess',
+			},
+		],
+		OPTIMISTIC_CREATE_ITEM_FAIL: [
+			{
+				target: ['#Root.main.master'],
+				actions: 'restoreOptimisticNewItem',
+			},
+		],
 
-- how to control show/hide of modal window, along with preparing data for it to display
-
-- event listed as Enumeration data type using `Enum` instead of strings
-
-- how to integrate any 3rd parti ui libraries, using `notifications` as an example here
-
-- storing { state, send } in react context using `useContext` so that child components could easily fetch and use it, no need to pass it around as `props`
-
-- the relationship between fsm state and ui may not be mapped 1:1, pay attention to how `loading` and `error` are using the same component to represent different states
-
-- making `machine` file clean and serializable by moving all `actions` and `guards` into it's own file
-
-- bonus: multipe requests could be cancelled, for use case like `search as you type` where multipe requests might be sent in a short time
+		// optimistic result - edit item
+		OPTIMISTIC_EDIT_ITEM_SUCCESS: [
+			{
+				target: ['#Root.main.master'],
+				actions: 'editOptimisticItemSuccess',
+			},
+		],
+		OPTIMISTIC_EDIT_ITEM_FAIL: [
+			{
+				target: ['#Root.main.master'],
+				actions: 'restoreOptimisticEditItem',
+			},
+		],
+	}
+}
+```
 
 ## Statechart
 
