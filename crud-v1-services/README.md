@@ -1,23 +1,17 @@
 
-- This is a typical CRUD applicaiton with master|detail|modal screens.
-
 ## Goal
 
-Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
+- This is a typical CRUD applicaiton with master|detail|modal screens.
 
-## Key Features
+- Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
+
+## What to see in this example
 
 - switch between master|detail|modal screen by fsm states
 
-- optimistic update for create and delete of items
-
-- making context immutable with `xstate/immer`
-
-- use react `memo` to prevent unnecessary re-render
+- optimistic update for creating and deleting items
 
 - how to control show/hide of modal window, along with preparing data for it to display
-
-- event listed as Enumeration data type using `Enum` instead of strings
 
 - how to integrate any 3rd parti ui libraries, using `notifications` as an example here
 
