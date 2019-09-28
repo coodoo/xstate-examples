@@ -5,6 +5,8 @@ Each one was built upon the previous one, hence it's recommended to start with `
 
 PRs welcomed and feel free to open issues for any bugs or question you might have.
 
+All these examples are built with the help from [stateskit.com](https://stateskit.com)'s visual statechart editor, don't forget to try it out 😎
+
 ## Core features of each example
 
 ### `crud-v1-services`
