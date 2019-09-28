@@ -1,38 +1,49 @@
-This is a typical CRUD applicaiton with master|detail|modal screens.
 
-# What's new
+## Goals
 
-	- Refactored optimistic states
-	- Swap Callback service to Promise
+This example demos using `Promise` instead of `Callback` for handling async operations (API invocation, database operation and any side-effects)
 
+## What to see in this example
 
-## Goal
+- See `services.js` for details, pay attentions to `loadItems` and `deleteItems`
 
-Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
+```js
+export const loadItems = (ctx, e) => {
 
-## Key Features
+	const t = random(300, 1000)
 
-- switch between master|detail|modal screen by fsm states
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
 
-- optimistic update for create and delete of items
+			const fakeItem = () => {
+				const id = randomId()
+				const d = {
+					id,
+					label: `Label_${id}`,
+				}
+				return d
+			}
 
-- making context immutable with `xstate/immer`
+			// instead of fetching data via API, we fake them here
+			const arr = [fakeItem(), fakeItem(), fakeItem()]
 
-- use react `memo` to prevent unnecessary re-render
+			console.log( '\nfetched: ', arr )
 
-- how to control show/hide of modal window, along with preparing data for it to display
+			// for test only
+			// randomly trigger happy and sorrow path to test both scenarios
+			// if((t % 2) == 0 ){
+			if(true){
+			// if(false){
+				resolve(arr)
+			} else {
+				reject('network error')
+			}
+		}, t)
+	})
+}
+```
 
-- event listed as Enumeration data type using `Enum` instead of strings
-
-- how to integrate any 3rd parti ui libraries, using `notifications` as an example here
-
-- storing { state, send } in react context using `useContext` so that child components could easily fetch and use it, no need to pass it around as `props`
-
-- the relationship between fsm state and ui may not be mapped 1:1, pay attention to how `loading` and `error` are using the same component to represent different states
-
-- making `machine` file clean and serializable by moving all `actions` and `guards` into it's own file
-
-- bonus: multipe requests could be cancelled, for use case like `search as you type` where multipe requests might be sent in a short time
+- Most of the time you will want to use `Callback` for that it can communicate with it's parent by sending multiple events, but for simpler tasks `Promise` might work as well, just bear in one you only get one chance to communicate with the parent (when the Promise was resolved or rejected)
 
 ## Statechart
 

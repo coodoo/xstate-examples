@@ -1,5 +1,5 @@
 
-## Goal
+## Goals
 
 - This is a typical CRUD applicaiton with master|detail|modal screens.
 
