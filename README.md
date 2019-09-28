@@ -1,7 +1,7 @@
 
 ## Here are four examples showing different usages of xstate.
 
-Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there.
+Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play, fork and report any issues you found here.
 
 ## Core features of each example
 
