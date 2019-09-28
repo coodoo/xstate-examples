@@ -1,6 +1,6 @@
 ## Goals
 
-This demo howcases how to model multi-thread application with `xstate` which requires frequent parent <-> child communcation, and how to separate concerns between parent and child machines using the `Actor` model.
+This demo showcased how to model multi-thread application with `xstate` which requires frequent parent <-> child communcation, and how to separate concerns between parent and child machines using the `Actor` model.
 
 ## What to see in this example?
 
@@ -19,3 +19,4 @@ This demo howcases how to model multi-thread application with `xstate` which req
 ## Statechart
 ![todos](https://user-images.githubusercontent.com/325936/65810958-08539800-e1e4-11e9-80d5-050a1a04bca9.png)
 ![todo](https://user-images.githubusercontent.com/325936/65810957-07bb0180-e1e4-11e9-9b03-44f68562b9cc.png)
+[All charts generated with StatesKit](https://stateskit.com)
