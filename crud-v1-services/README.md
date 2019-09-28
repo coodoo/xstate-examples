@@ -26,4 +26,4 @@
 ## Statechart
 
 ![v1](https://user-images.githubusercontent.com/325936/65810691-f8d25000-e1df-11e9-9c35-9d5e1d5a0fa5.png)
-
+All charts generated using [StatesKit](https://stateskit.com)

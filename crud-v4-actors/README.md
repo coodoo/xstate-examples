@@ -19,4 +19,4 @@ This demo showcased how to model multi-thread application with `xstate` which re
 ## Statechart
 ![todos](https://user-images.githubusercontent.com/325936/65810958-08539800-e1e4-11e9-80d5-050a1a04bca9.png)
 ![todo](https://user-images.githubusercontent.com/325936/65810957-07bb0180-e1e4-11e9-9b03-44f68562b9cc.png)
-[All charts generated with StatesKit](https://stateskit.com)
+All charts generated using [StatesKit](https://stateskit.com)

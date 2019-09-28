@@ -48,4 +48,4 @@ export const loadItems = (ctx, e) => {
 ## Statechart
 
 ![v3](https://user-images.githubusercontent.com/325936/65810689-f8d25000-e1df-11e9-8751-060d86bf14f8.png)
-[All charts generated with StatesKit](https://stateskit.com)
+All charts generated using [StatesKit](https://stateskit.com)

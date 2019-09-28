@@ -63,5 +63,5 @@ optimisticPending: {
 ## Statechart
 
 ![v2](https://user-images.githubusercontent.com/325936/65810692-f96ae680-e1df-11e9-9040-7ba0c3113abd.png)
-
+All charts generated using [StatesKit](https://stateskit.com)
 
