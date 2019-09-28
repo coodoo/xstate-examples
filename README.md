@@ -3,7 +3,7 @@
 
 Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play and fork those example, and report any issues you found here, PRs welcomed too.
 
-All these examples are built with the help from [stateskit.com](https://stateskit.com)'s visual statechart editor, don't forget to try it out 😎
+All these examples are built with [StatesKit](https://stateskit.com) - a visual statechart editor where you can drag and drop to creat states, events and stuff, no need to code at all, don't forget to try it out 😎
 
 ## Core features of each example
 
