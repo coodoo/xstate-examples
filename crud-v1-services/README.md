@@ -3,7 +3,7 @@
 
 - This is a typical CRUD applicaiton with master/detail/modal screens.
 
-- Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
+- Demonstrating how to model CRUD application with `xstate` using `parallel` states for screen transition and manage states using xstsat's `extended context` to replace redux.
 
 ## What to see in this example
 
