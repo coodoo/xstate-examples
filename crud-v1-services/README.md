@@ -1,7 +1,7 @@
 
 ## Goals
 
-- This is a typical CRUD applicaiton with master|detail|modal screens.
+- This is a typical CRUD applicaiton with master/detail/modal screens.
 
 - Demonstrating how to model CRUD application with `xstate` using `parallel states` to control screen switching and `context` to replace redux.
 
