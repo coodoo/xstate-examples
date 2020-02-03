@@ -1,9 +1,11 @@
 
 ## Here are four examples showing different usages of xstate.
 
-Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play and fork those example, and report any issues you found here, PRs welcomed too.
+Each one was built upon the previous one, hence it's recommended to start with `crud-v1-services` and move forward from there. All examples also available on codesandbox, feel free to play and fork those examples, and report any issues you found here, PRs welcome too.
 
-All these examples are built with [StatesKit](https://stateskit.com) - a visual statechart editor where you can drag and drop to creat states, events and stuff, no need to code at all, don't forget to try it out 😎
+All these examples are built with [StatesKit](https://stateskit.com) - a visual statechart editor where you can drag and drop to creat states, events and stuff, no need to code at all, the goal is to help dumping the ideas from your brain to states real quick, don't forget to give it shot! 😎
+
+Also [here's a detailed write up](https://gist.github.com/coodoo/0a7658a6c6580cb11101a9c22904d425) on statecharts introducing it's core benefits.
 
 ## Core features of each example
 
@@ -33,9 +35,9 @@ All these examples are built with [StatesKit](https://stateskit.com) - a visual 
 
 ### `crud-v4-actors`
 
-- `v4` is based on David's [TodoMVC](https://codesandbox.io/s/xstate-todomvc-33wr94qv1) example but with a couple of improvements.
+- `v4` is based on [David's](https://github.com/davidkpiano)[TodoMVC](https://codesandbox.io/s/xstate-todomvc-33wr94qv1) example but with a couple of improvements.
 
-- This is by far the most complex example, it showcased how to use the latest `Actor` model for communication between child components and their parent.
+- This is by far the most complicated example, it showcased how to use the latest `Actor` model for communication between child components and their parent.
 
 - Pay attention to how `TodosMachine` spawned child `TodoMachine`s and pass it's ref to each child component as a local single truth that handles the component state., more details in the folder's `Readme.md`
 
@@ -68,4 +70,4 @@ All these examples are built with [StatesKit](https://stateskit.com) - a visual 
 
 - Rewrite tests
 
-- Enable `whyDidYouRender` to see if there's any unnecesary re-renders
+- Enable `whyDidYouRender` to eliminate unnecessary renders.
